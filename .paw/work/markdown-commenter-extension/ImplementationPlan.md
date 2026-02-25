@@ -52,7 +52,7 @@ A publishable VS Code extension AND CLI package where:
 - [x] **Phase 1: Extension Shell** - Package structure, activation, build tooling
 - [x] **Phase 2: TypeScript Annotation Utilities** - Parser, writer, types for `> [!COMMENT]` blocks
 - [x] **Phase 3: Skill and Agent Content** - SKILL.md and .agent.md files with conditional blocks
-- [ ] **Phase 4: Skill/Agent Infrastructure** - Loader, installer, Language Model Tools
+- [x] **Phase 4: Skill/Agent Infrastructure** - Loader, installer, Language Model Tools
 - [ ] **Phase 5: CLI Installer Package** - npm package for terminal Copilot CLI users
 - [ ] **Phase 6: Documentation** - README, Docs.md, marketplace assets
 
@@ -256,9 +256,9 @@ Wire up the skill loading, agent installation, and Language Model Tool registrat
 ### Success Criteria
 
 #### Automated Verification:
-- [ ] `npm run compile` passes
-- [ ] `npm run lint` passes
-- [ ] `npm test` passes — all infrastructure tests
+- [x] `npm run compile` passes
+- [x] `npm run lint` passes
+- [x] `npm test` passes — all infrastructure tests
 
 #### Manual Verification:
 - [ ] Extension activates and installs agent to prompts directory

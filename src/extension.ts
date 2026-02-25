@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import { installAgentsIfNeeded } from './agents/installer';
+import { registerSkillTool } from './tools/skillTool';
 
 const OUTPUT_CHANNEL_NAME = 'Markdown Commenter';
 
@@ -14,11 +16,24 @@ export async function activate(context: vscode.ExtensionContext) {
   
   outputChannel.appendLine('[INFO] Markdown Commenter extension activated');
 
-  // TODO: Phase 4 - Install agent to prompts directory
-  // await installAgentIfNeeded(context, outputChannel);
+  // Install agents to prompts directory
+  try {
+    const installed = await installAgentsIfNeeded(context, outputChannel);
+    if (installed > 0) {
+      outputChannel.appendLine(`[INFO] Installed ${installed} agent(s)`);
+    }
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to install agents: ${error}`);
+  }
 
-  // TODO: Phase 4 - Register Language Model Tool for skill access
-  // registerSkillTool(context, outputChannel);
+  // Register Language Model Tool for skill access
+  try {
+    const toolDisposable = registerSkillTool(context);
+    context.subscriptions.push(toolDisposable);
+    outputChannel.appendLine('[INFO] Registered skill tool');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register skill tool: ${error}`);
+  }
 
   outputChannel.appendLine('[INFO] Markdown Commenter extension ready');
 }

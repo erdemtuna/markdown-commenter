@@ -23,13 +23,31 @@
     "configuration": {
       "title": "Markdown Commenter",
       "properties": {
-        "markdownCommenter.promptDirectory": {
+        "markdown-commenter.promptsDirectory": {
           "type": "string",
           "default": "",
           "description": "Custom directory for agent installation. Leave empty to use platform default."
         }
       }
-    }
+    },
+    "languageModelTools": [
+      {
+        "name": "markdown-commenter-skill",
+        "displayName": "Get Annotation Skill",
+        "toolReferenceName": "annotate-skill",
+        "modelDescription": "Returns the markdown annotation skill content for AI-assisted document annotation workflow",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "skill_name": {
+              "type": "string",
+              "description": "The name of the skill to load. Defaults to 'annotate'."
+            }
+          }
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
