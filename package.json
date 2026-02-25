@@ -52,6 +52,16 @@
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "markdown-commenter.annotateWithStatus",
+          "when": "false"
+        },
+        {
+          "command": "markdown-commenter.revealAnnotation",
+          "when": "false"
+        }
+      ],
       "editor/context": [
         {
           "command": "markdown-commenter.annotate",
