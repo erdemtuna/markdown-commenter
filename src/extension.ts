@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { installAgentsIfNeeded } from './agents/installer';
 import { registerSkillTool } from './tools/skillTool';
-import { registerAnnotateCommand } from './ui/commands';
+import { registerAnnotateCommand, registerRevealAnnotationCommand } from './ui/commands';
+import { AnnotationCodeLensProvider, registerCodeLensProvider } from './ui/codelens';
 
 const OUTPUT_CHANNEL_NAME = 'Markdown Commenter';
 
@@ -43,6 +44,35 @@ export async function activate(context: vscode.ExtensionContext) {
     outputChannel.appendLine('[INFO] Registered annotate command');
   } catch (error) {
     outputChannel.appendLine(`[ERROR] Failed to register annotate command: ${error}`);
+  }
+
+  // Register reveal annotation command (for CodeLens click)
+  try {
+    const revealCommand = registerRevealAnnotationCommand();
+    context.subscriptions.push(revealCommand);
+    outputChannel.appendLine('[INFO] Registered reveal annotation command');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register reveal annotation command: ${error}`);
+  }
+
+  // Register CodeLens provider for markdown files
+  try {
+    const codeLensProvider = new AnnotationCodeLensProvider();
+    const codeLensDisposable = registerCodeLensProvider(codeLensProvider);
+    context.subscriptions.push(codeLensDisposable);
+    context.subscriptions.push(codeLensProvider);
+
+    // Set up document change listener to trigger CodeLens refresh
+    const documentChangeListener = vscode.workspace.onDidChangeTextDocument((event) => {
+      if (event.document.languageId === 'markdown') {
+        codeLensProvider.triggerRefresh();
+      }
+    });
+    context.subscriptions.push(documentChangeListener);
+
+    outputChannel.appendLine('[INFO] Registered CodeLens provider');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register CodeLens provider: ${error}`);
   }
 
   outputChannel.appendLine('[INFO] Markdown Commenter extension ready');

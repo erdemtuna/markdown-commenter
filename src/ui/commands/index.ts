@@ -3,3 +3,4 @@
  */
 
 export { registerAnnotateCommand } from './annotateCommand';
+export { registerRevealAnnotationCommand } from './revealAnnotationCommand';

@@ -11,3 +11,4 @@
 export * from './constants';
 export * from './utils';
 export * from './commands';
+export * from './codelens';

@@ -1,5 +1,11 @@
 /**
- * CodeLens module - to be implemented in Phase 3
+ * CodeLens module for annotation status indicators
+ * 
+ * Provides CodeLens items above annotation blocks showing status
+ * with click-to-reveal functionality.
  */
 
-// Placeholder - CodeLens provider coming in Phase 3
+export {
+  AnnotationCodeLensProvider,
+  registerCodeLensProvider,
+} from './annotationCodeLensProvider';
