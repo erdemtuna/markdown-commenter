@@ -1,5 +1,6 @@
 .vscode/**
 .vscode-test/**
+vscode-test/**
 src/**
 .gitignore
 .eslintrc.json
@@ -9,3 +10,7 @@ src/**
 **/tsconfig.json
 node_modules/**
 .paw/**
+out/test/**
+cli/**
+WorkShaping.md
+**/.vscode-test/**

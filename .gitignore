@@ -21,3 +21,4 @@ Thumbs.db
 # .paw/ is intentionally tracked
 cli/dist/
 cli/node_modules/
+*.vsix
