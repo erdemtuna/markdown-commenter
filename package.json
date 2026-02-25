@@ -20,6 +20,51 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "markdown-commenter.annotate",
+        "title": "Add Annotation",
+        "category": "Markdown Commenter",
+        "icon": "$(comment)"
+      },
+      {
+        "command": "markdown-commenter.revealAnnotation",
+        "title": "Reveal Annotation",
+        "category": "Markdown Commenter"
+      },
+      {
+        "command": "markdown-commenter.focusAnnotationsView",
+        "title": "Focus Annotations Panel",
+        "category": "Markdown Commenter"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "markdown-commenter.annotate",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "editorTextFocus && editorLangId == markdown"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "markdown-commenter.annotate",
+          "when": "editorTextFocus && editorLangId == markdown && editorHasSelection",
+          "group": "1_modification"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "markdown-commenter.annotationsView",
+          "name": "Annotations",
+          "when": "editorLangId == markdown"
+        }
+      ]
+    },
     "configuration": {
       "title": "Markdown Commenter",
       "properties": {
