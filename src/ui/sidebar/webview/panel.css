@@ -97,38 +97,41 @@ body {
   gap: 10px;
 }
 
-/* Status icon - bold and colorful */
+/* Status icon - Fluent style badge */
 .status-icon {
-  font-size: 16px;
-  font-weight: bold;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
-/* Status colors - more vibrant with background badges */
+.status-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Status colors - vibrant backgrounds */
 .status-icon.accept {
   color: #fff;
-  background-color: #28a745;
+  background-color: #107c10;
 }
 
 .status-icon.reject {
   color: #fff;
-  background-color: #dc3545;
+  background-color: #d13438;
 }
 
 .status-icon.skip {
   color: #fff;
-  background-color: #6c757d;
+  background-color: #8a8886;
 }
 
 .status-icon.question {
   color: #fff;
-  background-color: #fd7e14;
+  background-color: #ca5010;
 }
 
 /* Display text (primary - prominent) */
@@ -140,17 +143,19 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 20px;
+  line-height: 22px;
 }
 
-/* Annotation ID (secondary - subtle) */
+/* Annotation ID (secondary - clearer) */
 .annotation-id {
   font-family: var(--vscode-editor-font-family);
-  font-size: 10px;
-  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vscode-textLink-foreground);
   margin-top: 4px;
-  padding-left: 30px; /* Align under text */
-  opacity: 0.7;
+  padding-left: 32px; /* Align under text */
+  opacity: 0.85;
+  letter-spacing: 0.3px;
 }
 
 /* High contrast adjustments */

@@ -13,12 +13,12 @@
   const placeholder = document.getElementById('placeholder');
   const annotationsList = document.getElementById('annotations-list');
   
-  // Status icons (Unicode for webview display)
+  // Status icons - Fluent UI style SVGs
   const STATUS_ICONS = {
-    'Accept': '✓',
-    'Reject': '✗',
-    'Skip': '⏭',
-    'Question': '?',
+    'Accept': `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>`,
+    'Reject': `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg>`,
+    'Skip': `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4.25 3a.75.75 0 01.75.75v8.5a.75.75 0 01-1.5 0v-8.5A.75.75 0 014.25 3zm6.5 0a.75.75 0 01.53.22l3.5 3.5a.75.75 0 010 1.06l-3.5 3.5a.75.75 0 01-1.28-.53V8.5H6.75a.75.75 0 010-1.5H10V4.75a.75.75 0 01.22-.53.75.75 0 01.53-.22z"/></svg>`,
+    'Question': `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm9 3a1 1 0 11-2 0 1 1 0 012 0zM6.92 6.085c.081-.16.19-.299.34-.398.145-.097.371-.187.74-.187.28 0 .553.087.738.225.167.126.262.291.262.478 0 .39-.152.616-.525.93l-.084.07c-.392.325-.738.66-.738 1.267v.25a.75.75 0 001.5 0v-.115c0-.134.075-.238.286-.415l.09-.074c.448-.371.897-.793.897-1.563 0-.498-.22-.923-.628-1.234-.396-.302-.918-.463-1.476-.463-.605 0-1.102.163-1.464.429-.37.27-.626.644-.788 1.057a.75.75 0 101.392.556z"/></svg>`,
   };
   
   // Current state
@@ -107,7 +107,7 @@
     // Status icon
     const statusIcon = document.createElement('span');
     statusIcon.className = `status-icon ${annotation.status.toLowerCase()}`;
-    statusIcon.textContent = STATUS_ICONS[annotation.status] || '•';
+    statusIcon.innerHTML = STATUS_ICONS[annotation.status] || '•';
     statusIcon.setAttribute('aria-hidden', 'true');
     mainRow.appendChild(statusIcon);
     
