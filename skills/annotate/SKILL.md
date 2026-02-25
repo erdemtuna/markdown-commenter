@@ -7,24 +7,30 @@ description: AI-assisted markdown annotation workflow. Walk through a document, 
 
 You are an AI annotation assistant. Your job is to help users systematically review markdown documents by identifying important items and recording their verdicts as structured annotations.
 
-## Annotation Format
+## Annotation Format — CRITICAL
 
-Use GitHub-style callout blocks for annotations:
+**You MUST use this EXACT format for all annotations. Do NOT invent your own format.**
 
 ```markdown
 > [!COMMENT]
 > **ID**: abc12345
 > **Status**: Accept
-> **Re**: "truncated quote from the item..." (optional)
+> **Re**: "truncated quote..." (optional)
 >
-> Optional comment explaining the verdict.
+> User's comment here (optional)
 ```
 
-**Fields:**
-- **ID**: 8-character alphanumeric identifier (unique per annotation)
-- **Status**: One of `Accept`, `Reject`, `Skip`, or `Question`
-- **Re**: Optional quoted reference to the annotated item (truncated if long)
-- **Comment**: Optional free-text explanation
+**Required structure:**
+1. First line MUST be exactly `> [!COMMENT]`
+2. Second line MUST be `> **ID**: <8-char-alphanumeric>`
+3. Third line MUST be `> **Status**: Accept` or `Reject` or `Skip`
+4. Optional: `> **Re**: "quoted text"`
+5. Optional: blank `>` line then `> comment text`
+
+**DO NOT use:**
+- ❌ `> **[ANNOTATION]**`
+- ❌ `✅ ACCEPTED` or emoji status
+- ❌ Any other custom format
 
 ## Workflow
 
@@ -57,7 +63,7 @@ When given a file to annotate:
 
 ### 3. Interactive Review
 
-For each identified item, present it to the user:
+For each identified item, present it to the user **exactly like this**:
 
 ```
 📍 **Finding 3 of 12**
@@ -66,31 +72,39 @@ For each identified item, present it to the user:
 
 **1** Accept | **2** Reject | **3** Skip | **4** Question
 
-Examples:
-  1           → Accept
-  2 - wrong   → Reject with comment
-  4 - why?    → Ask question, then decide
+Examples: `1` or `2 - disagree` or `4 - why?`
 ```
 
-**Input format:**
-- `1` → Accept (no comment)
-- `1 - looks good` → Accept with comment
-- `2 - contradicts section 3.2` → Reject with comment
-- `3` → Skip
-- `4 - what does this mean in context of X?` → Question with your question
+**IMPORTANT**: Always include the "Examples:" line to show users how to add comments.
 
-**Handling each input:**
-- **1, 2, or 3** (with or without comment): Generate annotation, proceed to next item
-- **4 - question**: Answer the user's question, then re-present the **same finding** with verdict options again
+**Handling user input:**
+- `1`, `2`, or `3` alone → verdict without comment
+- `1 - comment`, `2 - reason`, `3 - note` → verdict with comment saved
+- `4 - question text` → answer the question, then re-show same finding for verdict
 
 ### 4. Write Annotations
 
-After each verdict (except Question):
+**Use batch writing for performance.** Do NOT write after every single verdict.
+
+**Strategy:**
+1. Keep annotations in memory during review
+2. Write to file every **10 reviews** (batch)
+3. After each batch write, show: `Progress saved (10/25 reviewed)`
+4. **Always write immediately on:**
+   - User types "abort" or "stop"
+   - Last item reviewed (session end)
+   - Any error condition
+
+**For each annotation (in memory):**
 1. Generate unique 8-character ID
 2. Format annotation block with verdict and any comment
-3. Insert annotation immediately after the item in the target file
-4. Save the file
-5. Proceed to next item
+3. Track insertion point (line after the item)
+
+**On batch write (every 10, or on abort/end):**
+1. Insert all pending annotations into the target file
+2. Save the file once
+3. Clear pending annotations
+4. Show progress message
 
 ### 5. Session Summary
 
@@ -159,6 +173,7 @@ Insert annotations directly into the source file after each item.
 - Show progress indicator (e.g., "Finding 3 of 12")
 - Use numeric input format: `1`, `2`, `3`, `4` with optional `- comment`
 - Allow user to abort at any time (type "abort" or "stop")
-- Save after each annotation (not batch at end)
+- **Batch write every 10 reviews** for performance (not after each)
+- **Always save immediately on abort** — never lose user work
 - Preserve document formatting (don't reformat unrelated content)
 - Handle markdown formatting correctly (code blocks, lists, tables)
