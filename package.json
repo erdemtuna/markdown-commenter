@@ -59,7 +59,8 @@
     "install-local": "npm run package && code --install-extension markdown-commenter-*.vsix --force",
     "cli:build": "cd cli && npm run build",
     "cli:link": "cd cli && npm link",
-    "cli:install-local": "npm run cli:build && node cli/bin/cli.js install copilot"
+    "cli:install-local": "npm run cli:build && node cli/bin/cli.js install copilot",
+    "cli:reinstall": "node cli/bin/cli.js uninstall; rm -rf ~/.paw/markdown-commenter; npm run cli:install-local"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
