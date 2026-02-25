@@ -29,9 +29,9 @@ The repository contains only `WorkShaping.md` (requirements exploration) and PAW
 
 A publishable VS Code extension AND CLI package where:
 1. Extension installs from Marketplace and activates without errors
-2. Agent file is installed to user's prompts directory on activation (VS Code)
+2. Agent file is installed to VS Code's prompts directory on activation (`~/.config/Code/User/prompts/` on Linux)
 3. Copilot CLI skill is accessible via Language Model Tool (VS Code)
-4. CLI package installs skill and agent to `~/.copilot/` for terminal users
+4. CLI package installs skill and agent to `~/.copilot/agents/` and `~/.copilot/skills/` for terminal users
 5. User can invoke annotation workflow via CLI (terminal) or Chat (VS Code)
 6. Annotations written in correct `> [!COMMENT]` format
 7. TypeScript utilities correctly parse/write annotation blocks

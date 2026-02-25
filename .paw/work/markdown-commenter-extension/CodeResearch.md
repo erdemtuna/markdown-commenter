@@ -21,9 +21,10 @@ The phased-agent-workflow project provides a complete reference implementation f
 
 1. **Extension structure**: Standard VS Code extension with `package.json`, `extension.ts`, TypeScript source in `src/`
 2. **Skills**: Stored in `skills/<skill-name>/SKILL.md` at extension root, loaded via TypeScript utilities
-3. **Agents**: Stored in `agents/<name>.agent.md` at extension root, installed to user's prompts directory on activation
-4. **Distribution**: Skills are served via Language Model Tools; agents are copied to platform-specific prompts directory
-5. **TypeScript utilities**: `src/skills/skillLoader.ts` parses SKILL.md frontmatter; `src/agents/installer.ts` handles agent installation
+3. **Agents**: Stored in `agents/<name>.agent.md` at extension root, installed to VS Code's prompts directory on activation
+4. **VS Code distribution**: Skills are served via Language Model Tools; agents are copied to VS Code prompts directory (`~/.config/Code/User/prompts/` on Linux)
+5. **CLI distribution**: Separate CLI package installs agents to `~/.copilot/agents/` and skills to `~/.copilot/skills/`
+6. **TypeScript utilities**: `src/skills/skillLoader.ts` parses SKILL.md frontmatter; `src/agents/installer.ts` handles agent installation
 
 The markdown-commenter extension can follow this pattern with minimal modifications.
 
@@ -112,7 +113,7 @@ Agents are installed to the user's platform-specific prompts directory on extens
 
 **Reference**: `phased-agent-workflow/src/agents/installer.ts:77-87` — `getPromptsDirectoryPath()` function
 - Detects platform (macOS, Windows, Linux)
-- Returns appropriate path (e.g., `~/.cursor/prompts/`, `~/.copilot/prompts/`)
+- Returns appropriate path (e.g., `~/.config/Code/User/prompts/` on Linux, `~/Library/Application Support/Code/User/prompts/` on macOS)
 - Supports custom path via `paw.promptDirectory` setting
 
 **Reference**: `phased-agent-workflow/src/agents/agentTemplates.ts:99-134` — `loadAgentTemplates()` function

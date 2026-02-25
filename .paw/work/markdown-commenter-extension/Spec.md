@@ -134,7 +134,7 @@ This work focuses on the AI-assisted annotation path. Manual annotation features
 
 - **Dual distribution model**: Following the PAW pattern, we provide two distribution mechanisms: (1) VS Code extension for IDE users, (2) CLI package for terminal Copilot CLI users.
 - **VS Code extension skill access**: In VS Code, skills are served via Language Model Tools (`vscode.lm.registerTool`), not file system discovery. Agents call the tool to retrieve skill content.
-- **VS Code agent installation**: Agent files are installed to the user's prompts directory (`~/.copilot/prompts/` or platform equivalent) on extension activation, making them discoverable by VS Code Copilot Chat.
+- **VS Code agent installation**: Agent files are installed to VS Code's prompts directory (`~/.config/Code/User/prompts/` on Linux, `~/Library/Application Support/Code/User/prompts/` on macOS, `%APPDATA%\Code\User\prompts` on Windows) on extension activation, making them discoverable by VS Code Copilot Chat.
 - **CLI package installation**: The CLI package (`npx @erdem-tuna/markdown-commenter install copilot`) copies agents to `~/.copilot/agents/` and skills to `~/.copilot/skills/`, making them discoverable by Copilot CLI in terminal.
 - **Finding heuristics sufficient**: Structural heuristics (headers, bullets, keywords) will identify most reviewable items in typical review documents. Edge cases handled gracefully with "no findings" message.
 - **File write permissions**: Agent has write access to target file or output destination.

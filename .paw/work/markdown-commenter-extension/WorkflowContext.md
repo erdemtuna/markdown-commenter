@@ -33,7 +33,7 @@ Additional Inputs: Reference project at /home/erdemtuna/workspace/personal/phase
 
 - [x] Specification
 - [x] Code Research
-- [ ] Planning
+- [x] Planning
 - [ ] Planning Review
 - [ ] Implementation
 - [ ] Implementation Review
