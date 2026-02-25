@@ -61,9 +61,9 @@ Design follows VS Code's native aesthetics using Fluent 2 Web Components (`@flue
 - [x] **Phase 2: Quick-pick Annotation Command** - Implement core annotation workflow with status selection and comment input
 - [x] **Phase 3: CodeLens Provider** - Display status indicators above annotation blocks with click handling
 - [x] **Phase 2B: Hover-based Annotation UI** - Contextual hover with clickable status buttons near text selection
-- [ ] **Phase 4: Sidebar Panel** - Webview-based annotation list with navigation and real-time updates
-- [ ] **Phase 5: Status Bar & Polish** - Annotation count display and cross-component integration
-- [ ] **Phase 6: Documentation** - README, CHANGELOG, and Docs.md updates
+- [x] **Phase 4: Sidebar Panel** - Webview-based annotation list with navigation and real-time updates
+- [x] **Phase 5: Status Bar & Polish** - Annotation count display and cross-component integration
+- [x] **Phase 6: Documentation** - README, CHANGELOG, and Docs.md updates
 
 ## Phase Candidates
 

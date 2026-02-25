@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Interactive UI components for manual annotation in VS Code:
+  - Quick-pick command with keyboard shortcut (`Ctrl+Shift+A` / `Cmd+Shift+A`)
+  - Hover-based status buttons for contextual annotation
+  - CodeLens indicators above annotation blocks
+  - Sidebar panel listing all annotations with click-to-navigate
+  - Status bar annotation count
+  - Context menu integration
 - Initial release of Markdown Commenter
 - VS Code extension with Copilot Chat agent integration
 - CLI package for GitHub Copilot CLI users

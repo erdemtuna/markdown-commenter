@@ -10,6 +10,17 @@ AI-assisted markdown annotation for VS Code and Copilot CLI. Systematically revi
 - **Dual Distribution**: Works in VS Code (extension) and terminal (Copilot CLI)
 - **Resume Support**: Pick up where you left off — already-annotated items are skipped
 
+### VS Code UI Components
+
+The extension provides rich UI for manual annotation without AI:
+
+- **Quick-pick Command** (`Ctrl+Shift+A` / `Cmd+Shift+A`) — Select text, choose status, add optional comment
+- **Hover UI** — Select text and hover to see clickable status buttons (`✓ Accept`, `✗ Reject`, etc.)
+- **CodeLens** — Status indicators appear above each annotation block; click to navigate
+- **Sidebar Panel** — Lists all annotations in the current file; click to jump to location
+- **Status Bar** — Shows annotation count; click to reveal sidebar panel
+- **Context Menu** — Right-click selected text → "Add Annotation"
+
 ## Installation
 
 ### VS Code Extension
