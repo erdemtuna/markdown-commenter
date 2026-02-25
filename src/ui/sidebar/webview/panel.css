@@ -1,0 +1,238 @@
+/**
+ * Annotations Panel Stylesheet
+ * 
+ * Styles for the webview-based annotations sidebar panel.
+ * Uses VS Code theme variables for consistent appearance across themes.
+ */
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-sideBar-background);
+  padding: 8px;
+  line-height: 1.4;
+}
+
+/* Container */
+#annotations-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Placeholder state */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--vscode-descriptionForeground);
+}
+
+.placeholder .codicon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.placeholder p {
+  font-size: 12px;
+}
+
+/* Hidden state */
+.hidden {
+  display: none !important;
+}
+
+/* Annotations list */
+.annotations-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Annotation item */
+.annotation-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: var(--vscode-list-hoverBackground);
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.annotation-item:hover {
+  background-color: var(--vscode-list-activeSelectionBackground);
+  border-color: var(--vscode-focusBorder);
+  transform: translateX(2px);
+}
+
+.annotation-item:focus {
+  outline: none;
+  border-color: var(--vscode-focusBorder);
+  background-color: var(--vscode-list-activeSelectionBackground);
+}
+
+.annotation-item:focus-visible {
+  outline: 2px solid var(--vscode-focusBorder);
+  outline-offset: -2px;
+}
+
+/* Main row (status icon + text) */
+.annotation-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Status icon - Fluent style circular badge */
+.status-icon {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.status-icon svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+/* Status colors - Fluent palette */
+.status-icon.accept {
+  color: #fff;
+  background: linear-gradient(135deg, #107c10 0%, #0e6e0e 100%);
+  box-shadow: 0 1px 3px rgba(16, 124, 16, 0.3);
+}
+
+.status-icon.reject {
+  color: #fff;
+  background: linear-gradient(135deg, #d13438 0%, #bc2f32 100%);
+  box-shadow: 0 1px 3px rgba(209, 52, 56, 0.3);
+}
+
+.status-icon.skip {
+  color: #fff;
+  background: linear-gradient(135deg, #8a8886 0%, #797775 100%);
+  box-shadow: 0 1px 3px rgba(138, 136, 134, 0.3);
+}
+
+.status-icon.question {
+  color: #fff;
+  background: linear-gradient(135deg, #ca5010 0%, #b5480e 100%);
+  box-shadow: 0 1px 3px rgba(202, 80, 16, 0.3);
+}
+
+/* Display text (primary - prominent) */
+.annotation-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 22px;
+}
+
+/* Annotation ID (secondary - clearer) */
+.annotation-id {
+  font-family: var(--vscode-editor-font-family);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vscode-textLink-foreground);
+  margin-top: 4px;
+  padding-left: 32px; /* Align under text */
+  opacity: 0.85;
+  letter-spacing: 0.3px;
+}
+
+/* High contrast adjustments */
+@media (prefers-contrast: more) {
+  .annotation-item {
+    border: 1px solid var(--vscode-contrastBorder);
+  }
+  
+  .annotation-item:hover,
+  .annotation-item:focus {
+    border-color: var(--vscode-focusBorder);
+  }
+  
+  .status-icon.accept {
+    background-color: #00aa00;
+  }
+  
+  .status-icon.reject {
+    background-color: #dd0000;
+  }
+  
+  .status-icon.skip {
+    background-color: #555;
+  }
+  
+  .status-icon.question {
+    background-color: #cc6600;
+  }
+  
+  .annotation-text,
+  .annotation-id {
+    opacity: 1;
+  }
+}
+
+/* VS Code high contrast theme support */
+body.vscode-high-contrast .annotation-item {
+  border: 1px solid var(--vscode-contrastBorder, #ffffff);
+}
+
+body.vscode-high-contrast .status-icon.accept {
+  background-color: #00cc00;
+}
+
+body.vscode-high-contrast .status-icon.reject {
+  background-color: #ff0000;
+}
+
+body.vscode-high-contrast .status-icon.question {
+  background-color: #ff8800;
+}
+
+body.vscode-high-contrast-light .annotation-item {
+  border: 1px solid var(--vscode-contrastBorder, #000000);
+}
+
+/* Keyboard focus indicator */
+.annotation-item[aria-selected="true"] {
+  background-color: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

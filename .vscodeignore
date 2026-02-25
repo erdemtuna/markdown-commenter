@@ -1,0 +1,30 @@
+# VS Code test harness (must be first - highest priority exclusion)
+.vscode-test
+
+# VS Code settings
+.vscode
+
+# Build and configuration files
+.gitignore
+.eslintrc.json
+**/tsconfig.json
+**/*.map
+
+# TypeScript source files (exclude all .ts, include only out/*.d.ts)
+**/*.ts
+!out/**/*.d.ts
+
+# Source directory (but keep webview assets)
+src/**
+!src/ui/sidebar/webview/**
+
+# Dependencies and test output
+node_modules
+out/test
+
+# PAW workflow artifacts
+.paw
+
+# CLI and docs
+cli
+WorkShaping.md

@@ -1,0 +1,141 @@
+{
+  "name": "markdown-commenter",
+  "displayName": "Markdown Commenter",
+  "description": "AI-assisted markdown annotation with Copilot CLI skill and VS Code Chat agent",
+  "version": "0.0.1-dev",
+  "publisher": "erdem-tuna",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erdem-tuna/markdown-commenter"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "markdown-commenter.annotate",
+        "title": "Add Annotation",
+        "category": "Markdown Commenter",
+        "icon": "$(comment)"
+      },
+      {
+        "command": "markdown-commenter.annotateWithStatus",
+        "title": "Annotate with Status",
+        "category": "Markdown Commenter"
+      },
+      {
+        "command": "markdown-commenter.revealAnnotation",
+        "title": "Reveal Annotation",
+        "category": "Markdown Commenter"
+      },
+      {
+        "command": "markdown-commenter.focusAnnotationsView",
+        "title": "Focus Annotations Panel",
+        "category": "Markdown Commenter"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "markdown-commenter.annotate",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "editorTextFocus && editorLangId == markdown"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "markdown-commenter.annotateWithStatus",
+          "when": "false"
+        },
+        {
+          "command": "markdown-commenter.revealAnnotation",
+          "when": "false"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "markdown-commenter.annotate",
+          "when": "editorTextFocus && editorLangId == markdown && editorHasSelection",
+          "group": "1_modification"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "markdown-commenter.annotationsView",
+          "name": "Annotations"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Markdown Commenter",
+      "properties": {
+        "markdown-commenter.promptsDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Custom directory for agent installation. Leave empty to use platform default."
+        }
+      }
+    },
+    "languageModelTools": [
+      {
+        "name": "markdown-commenter-skill",
+        "displayName": "Get Annotation Skill",
+        "toolReferenceName": "annotate-skill",
+        "modelDescription": "Returns the markdown annotation skill content for AI-assisted document annotation workflow",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "skill_name": {
+              "type": "string",
+              "description": "The name of the skill to load. Defaults to 'annotate'."
+            }
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "install-local": "npm run package && code --install-extension markdown-commenter-*.vsix --force",
+    "cli:build": "cd cli && npm run build",
+    "cli:link": "cd cli && npm link",
+    "cli:install-local": "npm run cli:build && node cli/bin/cli.js install copilot",
+    "cli:reinstall": "node cli/bin/cli.js uninstall; rm -rf ~/.paw/markdown-commenter; npm run cli:install-local"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^2.22.0",
+    "eslint": "^8.56.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@fluentui/tokens": "^1.0.0-alpha.23",
+    "@fluentui/web-components": "^3.0.0-beta.133"
+  }
+}

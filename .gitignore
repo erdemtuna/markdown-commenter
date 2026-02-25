@@ -1,0 +1,24 @@
+# Build output
+out/
+
+# Dependencies
+node_modules/
+
+# VS Code test runner
+.vscode-test/
+
+# Package output
+*.vsix
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+
+# PAW workflow artifacts (keep in git but exclude from package)
+# .paw/ is intentionally tracked
+cli/dist/
+cli/node_modules/
+*.vsix
