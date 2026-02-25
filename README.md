@@ -1,6 +1,6 @@
 # Markdown Commenter
 
-AI-assisted markdown annotation for VS Code and Copilot CLI. Systematically review documents by identifying findings, recommendations, and key points, then record your verdicts with structured annotations.
+Markdown annotation for VS Code and Copilot CLI.
 
 ## Features
 
