@@ -28,7 +28,28 @@ Use GitHub-style callout blocks for annotations:
 
 ## Workflow
 
-### 1. Read and Analyze
+### 1. Setup
+
+Before starting annotation, ask the user:
+
+```
+📄 **Output Mode**
+
+Where should I write annotations?
+
+**1** Original file (modify in-place)
+**2** Separate file (`.annotate/` folder, preserves original)
+
+Enter 1 or 2:
+```
+
+If user selects **2** (separate file):
+- Create `.annotate/` folder in the same directory as the source file
+- Copy the original file to `.annotate/<filename>`
+- All annotations go into the copy, original stays untouched
+- Example: `report.md` → `.annotate/report.md`
+
+### 2. Read and Analyze
 
 When given a file to annotate:
 1. Read the full file content
@@ -40,7 +61,7 @@ When given a file to annotate:
    - Claims that may need verification
 3. Skip items that already have an annotation immediately following them
 
-### 2. Interactive Review
+### 3. Interactive Review
 
 For each identified item, present it to the user:
 
@@ -49,28 +70,32 @@ For each identified item, present it to the user:
 
 > [Item text here, with enough context to understand it]
 
-What's your verdict?
-- **Accept**: Agree with this item
-- **Reject**: Disagree or find issue
-- **Skip**: Not relevant / defer
-- **Question**: Need clarification
+**1** Accept | **2** Reject | **3** Skip | **4** Question
+
+Enter: number, or number - your comment/question
 ```
 
-Wait for user input. Handle each verdict:
+**Input format:**
+- `1` → Accept (no comment)
+- `1 - looks good` → Accept with comment
+- `2 - contradicts section 3.2` → Reject with comment
+- `3` → Skip
+- `4 - what does this mean in context of X?` → Question with your question
 
-- **Accept/Reject/Skip**: Generate annotation with user's optional comment
-- **Question**: Provide clarification, then ask for verdict again
+**Handling each input:**
+- **1, 2, or 3** (with or without comment): Generate annotation, proceed to next item
+- **4 - question**: Answer the user's question, then re-present the **same finding** with verdict options again
 
-### 3. Write Annotations
+### 4. Write Annotations
 
-After each verdict:
+After each verdict (except Question):
 1. Generate unique 8-character ID
 2. Format annotation block with verdict and any comment
-3. Insert annotation immediately after the item in the document
+3. Insert annotation immediately after the item in the target file
 4. Save the file
 5. Proceed to next item
 
-### 4. Session Summary
+### 5. Session Summary
 
 After all items reviewed, provide summary:
 
@@ -81,9 +106,9 @@ After all items reviewed, provide summary:
 - Accepted: 5
 - Rejected: 2
 - Skipped: 3
-- Questions resolved: 2
+- Questions answered: 2
 
-File saved: /path/to/document.md
+Output: /path/to/.annotate/document.md (or original if in-place)
 ```
 
 ## Edge Cases
@@ -100,12 +125,12 @@ If no reviewable items found:
 No reviewable items found in this document. The file appears to be empty or contains no findings/recommendations to annotate.
 ```
 
-### Question Verdict Loop
-If user selects Question:
-1. Explain the item in more detail
-2. Provide relevant context
-3. Ask for verdict again (Accept/Reject/Skip)
-4. Do not allow infinite Question loop (max 2 clarifications per item)
+### Question Flow
+When user enters `4 - <question>`:
+1. Answer their specific question about the finding
+2. Re-present the **same finding** with the verdict prompt
+3. User then enters 1, 2, or 3 to give final verdict
+4. Maximum 2 questions per finding (prevent infinite loop)
 
 ## Item Detection Heuristics
 
@@ -121,17 +146,22 @@ Look for these patterns to identify reviewable items:
 
 ## Output Modes
 
-### In-Place (Default)
+### In-Place (Option 1)
 Insert annotations directly into the source file after each item.
 
-### Summary Mode (if requested)
-Generate a separate summary file with all annotations collected, preserving original document unchanged.
+### Separate File (Option 2)
+- Create `.annotate/` folder in source file's directory
+- Copy original to `.annotate/<filename>`
+- Write all annotations to the copy
+- Original file remains unchanged
+- Useful for preserving original or when annotations shouldn't be committed
 
 ## Important Guidelines
 
-- Always ask before making the first annotation (confirm the file and approach)
+- Ask output mode (in-place vs `.annotate/` folder) before starting
 - Show progress indicator (e.g., "Finding 3 of 12")
-- Allow user to abort at any time
+- Use numeric input format: `1`, `2`, `3`, `4` with optional `- comment`
+- Allow user to abort at any time (type "abort" or "stop")
 - Save after each annotation (not batch at end)
 - Preserve document formatting (don't reformat unrelated content)
 - Handle markdown formatting correctly (code blocks, lists, tables)
