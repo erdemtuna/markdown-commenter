@@ -1,5 +1,5 @@
 /**
- * Commands module - to be implemented in Phase 2
+ * Commands module - exports all command registrations
  */
 
-// Placeholder - command implementations coming in Phase 2
+export { registerAnnotateCommand } from './annotateCommand';

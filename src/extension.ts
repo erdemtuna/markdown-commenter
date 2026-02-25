@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { installAgentsIfNeeded } from './agents/installer';
 import { registerSkillTool } from './tools/skillTool';
+import { registerAnnotateCommand } from './ui/commands';
 
 const OUTPUT_CHANNEL_NAME = 'Markdown Commenter';
 
@@ -33,6 +34,15 @@ export async function activate(context: vscode.ExtensionContext) {
     outputChannel.appendLine('[INFO] Registered skill tool');
   } catch (error) {
     outputChannel.appendLine(`[ERROR] Failed to register skill tool: ${error}`);
+  }
+
+  // Register UI commands
+  try {
+    const annotateCommand = registerAnnotateCommand();
+    context.subscriptions.push(annotateCommand);
+    outputChannel.appendLine('[INFO] Registered annotate command');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register annotate command: ${error}`);
   }
 
   outputChannel.appendLine('[INFO] Markdown Commenter extension ready');
