@@ -242,11 +242,21 @@ markdown-commenter/
 - `phased-agent-workflow/src/tools/skillTool.ts:14-60` — Language Model Tool registration
 - `phased-agent-workflow/tsconfig.json:1-16` — TypeScript configuration
 - `phased-agent-workflow/.vscodeignore:1-12` — VSIX packaging exclusions
+- `phased-agent-workflow/cli/README.md:1-141` — CLI package documentation
+- `phased-agent-workflow/cli/lib/installer.ts` — CLI installation logic
+- `phased-agent-workflow/src/agents/agentTemplateRenderer.ts:22-49` — Conditional block processing
+
+## Resolved Questions
+
+1. **Skill discovery mechanism**: PAW uses a **dual distribution model**:
+   - **VS Code**: Skills served via Language Model Tools (`vscode.lm.registerTool`)
+   - **CLI**: Separate npm package (`@paw-workflow/cli`) installs skills to `~/.copilot/skills/`
+   - The agent file uses conditional blocks (`{{#vscode}}`, `{{#cli}}`) to reference skills differently in each environment
+
+2. **Agent installation path**: Full multi-platform support (macOS, Windows, Linux) with configurable custom path. We will follow this pattern.
+
+3. **Annotation utilities scope**: Keep internal to extension. Future work could expose as separate npm package if needed.
 
 ## Open Questions
 
-1. **Skill discovery without tools**: Can Copilot CLI discover skills directly from `~/.copilot/skills/` or does it require the Language Model Tool approach? The reference project uses tools, suggesting direct discovery may not be reliable.
-
-2. **Agent installation path**: The reference project supports multiple platforms and custom paths. For initial release, should markdown-commenter support the same, or simplify to a single default path?
-
-3. **Annotation utilities scope**: Should the TypeScript annotation utilities be exposed as a public API (for potential CLI tool or other consumers), or kept internal to the extension?
+None — all questions resolved through deeper investigation of reference project.

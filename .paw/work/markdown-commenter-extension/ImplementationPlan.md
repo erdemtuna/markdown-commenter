@@ -2,7 +2,11 @@
 
 ## Overview
 
-Build a VS Code extension distributed via Marketplace that provides AI-assisted markdown annotation through a Copilot CLI skill and VS Code Copilot Chat agent. Users invoke the annotation workflow, the AI identifies reviewable items (findings, recommendations), walks users through each interactively, and writes structured `> [!COMMENT]` annotations with their verdicts.
+Build a VS Code extension distributed via Marketplace AND a CLI installer package that provides AI-assisted markdown annotation through a Copilot CLI skill and VS Code Copilot Chat agent. Users invoke the annotation workflow, the AI identifies reviewable items (findings, recommendations), walks users through each interactively, and writes structured `> [!COMMENT]` annotations with their verdicts.
+
+**Dual distribution model** (following PAW pattern):
+1. **VS Code Extension**: For IDE users — installs agent to prompts dir, serves skill via Language Model Tool
+2. **CLI Package**: For terminal users — `npx @erdem-tuna/markdown-commenter install copilot` installs to `~/.copilot/`
 
 ## Current State Analysis
 
@@ -10,26 +14,29 @@ The repository contains only `WorkShaping.md` (requirements exploration) and PAW
 
 **Key patterns from reference project** (CodeResearch.md):
 - Extension activates on `onStartupFinished`, installs agents to prompts directory
-- Skills served via Language Model Tools (`vscode.lm.registerTool`)
-- Agents installed to platform-specific paths (`~/.copilot/prompts/`, etc.)
+- Skills served via Language Model Tools (`vscode.lm.registerTool`) in VS Code
+- CLI package separately installs to `~/.copilot/agents/` and `~/.copilot/skills/`
+- Agent files use conditional blocks (`{{#vscode}}`, `{{#cli}}`) for environment-specific behavior
 - TypeScript utilities for skill/agent loading (`src/skills/skillLoader.ts`, `src/agents/installer.ts`)
 
 **Constraints**:
 - VS Code ^1.85.0 compatibility
+- Node.js 18.0.0+ for CLI package
 - Single skill, single agent (simpler than reference project)
 - Annotation utilities are new (not from reference)
 
 ## Desired End State
 
-A publishable VS Code extension where:
+A publishable VS Code extension AND CLI package where:
 1. Extension installs from Marketplace and activates without errors
-2. Agent file is installed to user's prompts directory on activation
-3. Copilot CLI skill is accessible via Language Model Tool
-4. User can invoke annotation workflow via CLI or Chat
-5. Annotations written in correct `> [!COMMENT]` format
-6. TypeScript utilities correctly parse/write annotation blocks
+2. Agent file is installed to user's prompts directory on activation (VS Code)
+3. Copilot CLI skill is accessible via Language Model Tool (VS Code)
+4. CLI package installs skill and agent to `~/.copilot/` for terminal users
+5. User can invoke annotation workflow via CLI (terminal) or Chat (VS Code)
+6. Annotations written in correct `> [!COMMENT]` format
+7. TypeScript utilities correctly parse/write annotation blocks
 
-**Verification approach**: Extension builds, passes lint/tests, packages as VSIX, skill/agent execute annotation workflow successfully.
+**Verification approach**: Extension builds, passes lint/tests, packages as VSIX; CLI package installs correctly; skill/agent execute annotation workflow successfully in both environments.
 
 ## What We're NOT Doing
 
@@ -38,15 +45,16 @@ A publishable VS Code extension where:
 - Multi-file batch annotation
 - Custom verdict types beyond Accept/Reject/Skip/Question
 - Export/reporting features
-- Monorepo structure with separate `packages/` — using single extension for simplicity
+- Monorepo structure with separate `packages/` — using single repo with `cli/` subdirectory
 
 ## Phase Status
 
 - [ ] **Phase 1: Extension Shell** - Package structure, activation, build tooling
 - [ ] **Phase 2: TypeScript Annotation Utilities** - Parser, writer, types for `> [!COMMENT]` blocks
-- [ ] **Phase 3: Skill and Agent Content** - SKILL.md and .agent.md files with workflow instructions
+- [ ] **Phase 3: Skill and Agent Content** - SKILL.md and .agent.md files with conditional blocks
 - [ ] **Phase 4: Skill/Agent Infrastructure** - Loader, installer, Language Model Tools
-- [ ] **Phase 5: Documentation** - README, Docs.md, marketplace assets
+- [ ] **Phase 5: CLI Installer Package** - npm package for terminal Copilot CLI users
+- [ ] **Phase 6: Documentation** - README, Docs.md, marketplace assets
 
 ## Phase Candidates
 
@@ -148,7 +156,7 @@ Create the annotation parsing and writing library that both the skill/agent and 
 
 ## Phase 3: Skill and Agent Content
 
-Create the Copilot CLI skill and VS Code Chat agent definition files containing the annotation workflow instructions.
+Create the Copilot CLI skill and VS Code Chat agent definition files containing the annotation workflow instructions. Agent file includes conditional blocks for VS Code vs CLI environments.
 
 ### Changes Required
 
@@ -166,22 +174,30 @@ Create the Copilot CLI skill and VS Code Chat agent definition files containing 
   - Resume logic: skip already-annotated items
   - Edge cases: empty file, no findings, malformed markdown
 
-- **`agents/Annotate.agent.md`**: VS Code Chat agent definition:
+- **`agents/Annotate.agent.md`**: Chat agent definition with conditional blocks:
   - YAML frontmatter: `description: 'Annotate - AI-assisted markdown annotation'`
-  - Reference to annotate skill for workflow
+  - `{{#vscode}}` blocks: Use Language Model Tool to get skill content
+  - `{{#cli}}` blocks: Read skill directly from `skills/annotate/SKILL.md`
+  - Core workflow instructions (shared between environments)
   - VS Code-specific context (active editor, file path)
-  - Integration with Copilot Chat patterns
+  - CLI-specific context (file path from user input)
+
+- **`src/agents/agentTemplateRenderer.ts`**: Conditional block processor:
+  - `processConditionalBlocks(content, environment)` — keeps matching blocks, removes others
+  - Supports `{{#vscode}}...{{/vscode}}` and `{{#cli}}...{{/cli}}` syntax
 
 ### Success Criteria
 
 #### Automated Verification:
 - [ ] `npm run lint` passes (markdown files don't need linting, but verify no regressions)
 - [ ] YAML frontmatter validates (name/description present)
+- [ ] Conditional block processor correctly strips/retains blocks based on environment
 
 #### Manual Verification:
 - [ ] Skill content follows SKILL.md format conventions (verified against reference project)
 - [ ] Agent content follows .agent.md format conventions
 - [ ] Workflow instructions cover all FR requirements from Spec.md
+- [ ] VS Code-processed agent references skill tool; CLI-processed agent references file path
 
 ---
 
@@ -252,14 +268,69 @@ Wire up the skill loading, agent installation, and Language Model Tool registrat
 
 ---
 
-## Phase 5: Documentation
+## Phase 5: CLI Installer Package
+
+Create the npm package that terminal Copilot CLI users can run to install skill and agent to `~/.copilot/`. Follows PAW's `cli/` directory pattern.
+
+### Changes Required
+
+- **`cli/package.json`**: CLI package manifest:
+  - name: `@erdem-tuna/markdown-commenter`
+  - version: synced with extension
+  - bin: `{ "markdown-commenter": "bin/cli.js" }`
+  - files: `["bin", "dist", "lib"]`
+  - engines: `{ "node": ">=18.0.0" }`
+
+- **`cli/bin/cli.js`**: Entry point (shebang, loads lib)
+
+- **`cli/lib/installer.ts`**: Installation logic:
+  - `install(target)` — install to copilot or claude
+  - `uninstall()` — remove installed files
+  - `list()` — show installed version
+  - Platform detection for target directories
+  - Manifest tracking (`~/.paw/markdown-commenter/manifest.json`)
+
+- **`cli/lib/builder.ts`**: Build distribution:
+  - Process agent conditional blocks for CLI environment
+  - Copy skills and agents to `dist/`
+  - Inject version metadata
+
+- **`cli/scripts/build.sh`**: Build script for distribution
+
+- **`cli/dist/`**: Built distribution (gitignored):
+  - `agents/Annotate.agent.md` (CLI-processed, no `{{#vscode}}` blocks)
+  - `skills/annotate/SKILL.md`
+
+- **`cli/README.md`**: CLI package documentation:
+  - Installation: `npx @erdem-tuna/markdown-commenter install copilot`
+  - Commands: install, uninstall, list
+  - What gets installed
+
+### Success Criteria
+
+#### Automated Verification:
+- [ ] `cd cli && npm install` completes
+- [ ] `cd cli && npm run build` produces `dist/` with processed files
+- [ ] `cd cli && npm run lint` passes
+- [ ] `cd cli && npm test` passes
+
+#### Manual Verification:
+- [ ] `node cli/bin/cli.js install copilot` installs to `~/.copilot/`
+- [ ] `ls ~/.copilot/skills/annotate/SKILL.md` exists after install
+- [ ] `ls ~/.copilot/agents/Annotate.agent.md` exists after install
+- [ ] `node cli/bin/cli.js list` shows installed version
+- [ ] `node cli/bin/cli.js uninstall` removes installed files
+
+---
+
+## Phase 6: Documentation
 
 Create documentation for users and maintainers, including Docs.md technical reference and README for marketplace.
 
 ### Changes Required
 
 - **`.paw/work/markdown-commenter-extension/Docs.md`**: Technical reference (load `paw-docs-guidance`):
-  - Architecture overview
+  - Architecture overview (dual distribution model)
   - Annotation format specification
   - Skill/agent workflow description
   - TypeScript API documentation
@@ -268,7 +339,7 @@ Create documentation for users and maintainers, including Docs.md technical refe
 
 - **`README.md`**: Marketplace-facing documentation:
   - Feature overview with screenshots/GIFs
-  - Installation instructions
+  - Installation instructions (VS Code Marketplace AND CLI)
   - Quick start guide (invoke annotation workflow)
   - Annotation format reference
   - Configuration options
@@ -295,6 +366,7 @@ Create documentation for users and maintainers, including Docs.md technical refe
 #### Manual Verification:
 - [ ] README renders correctly on GitHub
 - [ ] README has compelling feature description
+- [ ] README covers both VS Code and CLI installation
 - [ ] Docs.md covers all implemented functionality
 - [ ] Extension description in package.json is accurate
 - [ ] Icon displays correctly in VS Code Extensions view
@@ -308,3 +380,4 @@ Create documentation for users and maintainers, including Docs.md technical refe
 - Research: `.paw/work/markdown-commenter-extension/CodeResearch.md`
 - Work Shaping: `./WorkShaping.md`
 - Reference Project: `/home/erdemtuna/workspace/personal/phased-agent-workflow`
+- Reference CLI: `/home/erdemtuna/workspace/personal/phased-agent-workflow/cli`

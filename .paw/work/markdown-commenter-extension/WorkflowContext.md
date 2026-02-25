@@ -31,8 +31,8 @@ Additional Inputs: Reference project at /home/erdemtuna/workspace/personal/phase
 
 ## Stage Progress
 
-- [ ] Specification
-- [ ] Code Research
+- [x] Specification
+- [x] Code Research
 - [ ] Planning
 - [ ] Planning Review
 - [ ] Implementation

@@ -93,17 +93,18 @@ This work focuses on the AI-assisted annotation path. Manual annotation features
 ### Functional Requirements
 
 - FR-001: Extension activates in VS Code and registers its components (Stories: P5)
-- FR-002: Copilot CLI skill file defines the annotation workflow and is discoverable by Copilot CLI (Stories: P1, P5)
-- FR-003: VS Code Copilot Chat agent definition enables annotation workflow in IDE chat panel (Stories: P2, P5)
+- FR-002: Copilot CLI skill file defines the annotation workflow; served via Language Model Tool in VS Code, installed to `~/.copilot/skills/` via CLI package for terminal users (Stories: P1, P5)
+- FR-003: VS Code Copilot Chat agent definition enables annotation workflow in IDE chat panel; installed to prompts directory on extension activation (Stories: P2, P5)
 - FR-004: Agent parses markdown file and identifies reviewable items using heuristics (headers with keywords like "Finding", "Issue", "Recommendation"; bulleted lists with severity markers; numbered items) (Stories: P1, P2)
 - FR-005: Agent presents each reviewable item to user with context (item content, position in document) and verdict options (Accept, Reject, Skip, Question) (Stories: P1, P2, P4)
 - FR-006: Agent records user verdict by writing annotation block in GitHub callout format (`> [!COMMENT]`) adjacent to the item (Stories: P1, P2)
-- FR-007: Annotation block includes: unique short ID (8 chars), Status field, optional user comment (Stories: P1, P2)
+- FR-007: Annotation block includes: unique short ID (8 chars), Status field, optional Re field (for future manual annotation), optional user comment (Stories: P1, P2)
 - FR-008: Agent supports "Question" verdict flow where it provides clarification before allowing verdict revision or continuation (Stories: P4)
 - FR-009: Agent provides session summary upon completion showing verdict counts (Stories: P1)
 - FR-010: User can specify output destination: in-place edit or separate file (Stories: P3)
 - FR-011: Agent skips items that already have adjacent annotation blocks when resuming (Stories: P1, P2)
 - FR-012: TypeScript utilities provide annotation parsing and writing functions for programmatic use (Stories: P1, P2)
+- FR-013: CLI installer package enables terminal Copilot CLI users to install skill and agent via `npx` command (Stories: P1, P5)
 
 ### Key Entities
 
@@ -131,8 +132,10 @@ This work focuses on the AI-assisted annotation path. Manual annotation features
 
 ## Assumptions
 
-- **Copilot CLI skill discovery**: Skills in the extension's `skills/` directory will be discoverable when the extension is installed, either via VS Code settings or standard Copilot CLI skill paths.
-- **VS Code Chat agent discovery**: Agent definitions in the extension's `agents/` directory will be discoverable by VS Code Copilot Chat when the extension is installed.
+- **Dual distribution model**: Following the PAW pattern, we provide two distribution mechanisms: (1) VS Code extension for IDE users, (2) CLI package for terminal Copilot CLI users.
+- **VS Code extension skill access**: In VS Code, skills are served via Language Model Tools (`vscode.lm.registerTool`), not file system discovery. Agents call the tool to retrieve skill content.
+- **VS Code agent installation**: Agent files are installed to the user's prompts directory (`~/.copilot/prompts/` or platform equivalent) on extension activation, making them discoverable by VS Code Copilot Chat.
+- **CLI package installation**: The CLI package (`npx @erdem-tuna/markdown-commenter install copilot`) copies agents to `~/.copilot/agents/` and skills to `~/.copilot/skills/`, making them discoverable by Copilot CLI in terminal.
 - **Finding heuristics sufficient**: Structural heuristics (headers, bullets, keywords) will identify most reviewable items in typical review documents. Edge cases handled gracefully with "no findings" message.
 - **File write permissions**: Agent has write access to target file or output destination.
 - **Single file scope**: Each invocation operates on one file. Multi-file annotation is out of scope.
@@ -141,9 +144,11 @@ This work focuses on the AI-assisted annotation path. Manual annotation features
 
 **In Scope**:
 - VS Code extension package structure (package.json, extension.ts activation)
+- CLI installer package (`cli/` directory, npm publishable)
 - Copilot CLI skill file (`skills/annotate/SKILL.md`)
-- VS Code Copilot Chat agent definition (`agents/annotate.agent.md`)
-- Annotation format as defined in WorkShaping.md
+- VS Code Copilot Chat agent definition (`agents/Annotate.agent.md`)
+- Conditional blocks in agent for VS Code vs CLI environments (`{{#vscode}}`, `{{#cli}}`)
+- Annotation format as defined in WorkShaping.md (including optional `Re` field for future manual annotation)
 - Finding detection heuristics (documented in skill)
 - Interactive verdict flow with all four verdict types
 - Output destination control (in-place vs. new file)
@@ -151,6 +156,7 @@ This work focuses on the AI-assisted annotation path. Manual annotation features
 - Resume capability (skip already-annotated items)
 - TypeScript utilities for annotation parsing/writing (`src/annotations/`)
 - VS Code Marketplace publishing configuration
+- npm package publishing for CLI installer
 
 **Out of Scope**:
 - Manual annotation UI (selection-based annotation, CodeLens, sidebar panel)
@@ -164,9 +170,10 @@ This work focuses on the AI-assisted annotation path. Manual annotation features
 ## Dependencies
 
 - VS Code ^1.85.0 (for extension API compatibility)
-- Copilot CLI environment for skill execution
-- VS Code with Copilot Chat for agent execution
-- npm/Node.js for extension building and publishing
+- Node.js 18.0.0 or later (for CLI package)
+- Copilot CLI environment for skill execution (terminal)
+- VS Code with Copilot Chat for agent execution (IDE)
+- npm/Node.js for extension and CLI package building
 - vsce tool for VSIX packaging
 
 ## Risks & Mitigations
