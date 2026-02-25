@@ -49,6 +49,7 @@ export class AnnotationHoverProvider implements vscode.HoverProvider {
   provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.Hover> {
     // Get the active editor to check selection

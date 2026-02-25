@@ -92,11 +92,9 @@ export async function executeAnnotateWithStatusCommand(
 
   if (success) {
     // Move cursor to after the inserted annotation for better UX
+    // This also clears the selection, which hides the hover
     const newLineCount = annotationBlock.split('\n').length + 2; // +2 for blank lines
     const newPosition = new vscode.Position(insertLine + newLineCount, 0);
-    editor.selection = new vscode.Selection(newPosition, newPosition);
-    
-    // Clear the selection to hide the hover
     editor.selection = new vscode.Selection(newPosition, newPosition);
   }
 }
