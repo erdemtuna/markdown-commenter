@@ -51,7 +51,7 @@ A publishable VS Code extension AND CLI package where:
 
 - [x] **Phase 1: Extension Shell** - Package structure, activation, build tooling
 - [x] **Phase 2: TypeScript Annotation Utilities** - Parser, writer, types for `> [!COMMENT]` blocks
-- [ ] **Phase 3: Skill and Agent Content** - SKILL.md and .agent.md files with conditional blocks
+- [x] **Phase 3: Skill and Agent Content** - SKILL.md and .agent.md files with conditional blocks
 - [ ] **Phase 4: Skill/Agent Infrastructure** - Loader, installer, Language Model Tools
 - [ ] **Phase 5: CLI Installer Package** - npm package for terminal Copilot CLI users
 - [ ] **Phase 6: Documentation** - README, Docs.md, marketplace assets
@@ -189,9 +189,9 @@ Create the Copilot CLI skill and VS Code Chat agent definition files containing 
 ### Success Criteria
 
 #### Automated Verification:
-- [ ] `npm run lint` passes (markdown files don't need linting, but verify no regressions)
-- [ ] YAML frontmatter validates (name/description present)
-- [ ] Conditional block processor correctly strips/retains blocks based on environment
+- [x] `npm run lint` passes (markdown files don't need linting, but verify no regressions)
+- [x] YAML frontmatter validates (name/description present)
+- [x] Conditional block processor correctly strips/retains blocks based on environment
 
 #### Manual Verification:
 - [ ] Skill content follows SKILL.md format conventions (verified against reference project)
