@@ -5,6 +5,7 @@ import { registerAnnotateCommand, registerAnnotateWithStatusCommand, registerRev
 import { AnnotationCodeLensProvider, registerCodeLensProvider } from './ui/codelens';
 import { registerAnnotationHoverProvider } from './ui/hover';
 import { registerAnnotationsPanelProvider, registerFocusAnnotationsViewCommand, AnnotationsPanelProvider } from './ui/sidebar';
+import { AnnotationStatusBar } from './ui/statusbar';
 
 const OUTPUT_CHANNEL_NAME = 'Markdown Commenter';
 
@@ -106,23 +107,39 @@ export async function activate(context: vscode.ExtensionContext) {
     outputChannel.appendLine(`[ERROR] Failed to register focus annotations view command: ${error}`);
   }
 
-  // Set up shared event listeners for CodeLens and Sidebar updates
+  // Create status bar item for annotation count
+  let statusBar: AnnotationStatusBar | undefined;
   try {
-    // Document change listener (debounced for sidebar, triggers CodeLens refresh)
+    statusBar = new AnnotationStatusBar();
+    context.subscriptions.push(statusBar);
+    // Initialize with current editor
+    statusBar.update(vscode.window.activeTextEditor?.document);
+    outputChannel.appendLine('[INFO] Created status bar item');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to create status bar item: ${error}`);
+  }
+
+  // Set up shared event listeners for CodeLens, Sidebar, and Status Bar updates
+  try {
+    // Document change listener (debounced for sidebar, triggers CodeLens and status bar refresh)
     const documentChangeListener = vscode.workspace.onDidChangeTextDocument((event) => {
       if (event.document.languageId === 'markdown') {
         // Trigger CodeLens refresh (internal debouncing)
         codeLensProvider?.triggerRefresh();
         // Trigger sidebar debounced refresh (300ms per NFR-2)
         sidebarProvider?.triggerDebouncedRefresh(event.document);
+        // Update status bar count (immediate - lightweight operation)
+        statusBar?.update(event.document);
       }
     });
     context.subscriptions.push(documentChangeListener);
 
-    // Active editor change listener (immediate refresh for sidebar)
+    // Active editor change listener (immediate refresh for sidebar and status bar)
     const editorChangeListener = vscode.window.onDidChangeActiveTextEditor((editor) => {
       // Update sidebar immediately when switching editors
       sidebarProvider?.updateAnnotations(editor?.document);
+      // Update status bar count
+      statusBar?.update(editor?.document);
     });
     context.subscriptions.push(editorChangeListener);
 

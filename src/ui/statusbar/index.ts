@@ -1,5 +1,10 @@
 /**
- * Status bar module - to be implemented in Phase 5
+ * Status bar module
+ * 
+ * Provides the status bar item showing annotation count for the current file.
+ * 
+ * Components:
+ * - AnnotationStatusBar: Status bar item manager
  */
 
-// Placeholder - status bar item coming in Phase 5
+export { AnnotationStatusBar } from './annotationStatusBar';
