@@ -19,3 +19,5 @@ Thumbs.db
 
 # PAW workflow artifacts (keep in git but exclude from package)
 # .paw/ is intentionally tracked
+cli/dist/
+cli/node_modules/

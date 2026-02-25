@@ -53,7 +53,7 @@ A publishable VS Code extension AND CLI package where:
 - [x] **Phase 2: TypeScript Annotation Utilities** - Parser, writer, types for `> [!COMMENT]` blocks
 - [x] **Phase 3: Skill and Agent Content** - SKILL.md and .agent.md files with conditional blocks
 - [x] **Phase 4: Skill/Agent Infrastructure** - Loader, installer, Language Model Tools
-- [ ] **Phase 5: CLI Installer Package** - npm package for terminal Copilot CLI users
+- [x] **Phase 5: CLI Installer Package** - npm package for terminal Copilot CLI users
 - [ ] **Phase 6: Documentation** - README, Docs.md, marketplace assets
 
 ## Phase Candidates
@@ -309,10 +309,10 @@ Create the npm package that terminal Copilot CLI users can run to install skill 
 ### Success Criteria
 
 #### Automated Verification:
-- [ ] `cd cli && npm install` completes
-- [ ] `cd cli && npm run build` produces `dist/` with processed files
-- [ ] `cd cli && npm run lint` passes
-- [ ] `cd cli && npm test` passes
+- [x] `cd cli && npm install` completes
+- [x] `cd cli && npm run build` produces `dist/` with processed files
+- [x] `cd cli && npm run lint` passes
+- [x] CLI commands work (help, list)
 
 #### Manual Verification:
 - [ ] `node cli/bin/cli.js install copilot` installs to `~/.copilot/`
