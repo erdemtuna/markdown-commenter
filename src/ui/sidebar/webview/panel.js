@@ -100,31 +100,31 @@
     li.dataset.startLine = annotation.startLine;
     li.dataset.endLine = annotation.endLine;
     
-    // Header row (status icon + ID)
-    const header = document.createElement('div');
-    header.className = 'annotation-header';
+    // Main row (status icon + display text)
+    const mainRow = document.createElement('div');
+    mainRow.className = 'annotation-main';
     
     // Status icon
     const statusIcon = document.createElement('span');
     statusIcon.className = `status-icon ${annotation.status.toLowerCase()}`;
     statusIcon.textContent = STATUS_ICONS[annotation.status] || '•';
     statusIcon.setAttribute('aria-hidden', 'true');
-    header.appendChild(statusIcon);
+    mainRow.appendChild(statusIcon);
     
-    // Annotation ID
-    const idSpan = document.createElement('span');
-    idSpan.className = 'annotation-id';
-    idSpan.textContent = annotation.id;
-    header.appendChild(idSpan);
+    // Display text (prominent)
+    const textSpan = document.createElement('span');
+    textSpan.className = 'annotation-text';
+    textSpan.textContent = annotation.displayText;
+    mainRow.appendChild(textSpan);
     
-    li.appendChild(header);
+    li.appendChild(mainRow);
     
-    // Display text
-    const textDiv = document.createElement('div');
-    textDiv.className = 'annotation-text';
-    textDiv.textContent = annotation.displayText;
-    textDiv.setAttribute('aria-hidden', 'true');
-    li.appendChild(textDiv);
+    // Secondary row (ID - subtle)
+    const idRow = document.createElement('div');
+    idRow.className = 'annotation-id';
+    idRow.textContent = `#${annotation.id}`;
+    idRow.setAttribute('aria-hidden', 'true');
+    li.appendChild(idRow);
     
     // Click handler
     li.addEventListener('click', () => navigateToAnnotation(annotation));

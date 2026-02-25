@@ -59,7 +59,9 @@ export class AnnotationsPanelProvider implements vscode.WebviewViewProvider, vsc
    */
   resolveWebviewView(
     webviewView: vscode.WebviewView,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _context: vscode.WebviewViewResolveContext,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _token: vscode.CancellationToken
   ): void {
     this._view = webviewView;

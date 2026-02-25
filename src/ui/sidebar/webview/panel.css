@@ -64,18 +64,19 @@ body {
 .annotation-item {
   display: flex;
   flex-direction: column;
-  padding: 8px 10px;
-  margin-bottom: 4px;
-  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border-radius: 6px;
   cursor: pointer;
   background-color: var(--vscode-list-hoverBackground);
   border: 1px solid transparent;
-  transition: background-color 0.1s ease, border-color 0.1s ease;
+  transition: all 0.15s ease;
 }
 
 .annotation-item:hover {
   background-color: var(--vscode-list-activeSelectionBackground);
   border-color: var(--vscode-focusBorder);
+  transform: translateX(2px);
 }
 
 .annotation-item:focus {
@@ -89,57 +90,67 @@ body {
   outline-offset: -2px;
 }
 
-/* Header row (status icon + ID) */
-.annotation-header {
+/* Main row (status icon + text) */
+.annotation-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Status icon - bold and colorful */
+.status-icon {
+  font-size: 16px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-/* Status icon */
-.status-icon {
-  font-size: 14px;
-  font-weight: bold;
-  width: 16px;
-  text-align: center;
+  justify-content: center;
   flex-shrink: 0;
+  border-radius: 4px;
 }
 
-/* Status colors */
+/* Status colors - more vibrant with background badges */
 .status-icon.accept {
-  color: var(--vscode-testing-iconPassed, #89d185);
+  color: #fff;
+  background-color: #28a745;
 }
 
 .status-icon.reject {
-  color: var(--vscode-testing-iconFailed, #f14c4c);
+  color: #fff;
+  background-color: #dc3545;
 }
 
 .status-icon.skip {
-  color: var(--vscode-testing-iconSkipped, #848484);
+  color: #fff;
+  background-color: #6c757d;
 }
 
 .status-icon.question {
-  color: var(--vscode-editorWarning-foreground, #cca700);
+  color: #fff;
+  background-color: #fd7e14;
 }
 
-/* Annotation ID */
-.annotation-id {
-  font-family: var(--vscode-editor-font-family);
-  font-size: 11px;
-  color: var(--vscode-textLink-foreground);
-  opacity: 0.9;
-}
-
-/* Display text (reference/comment) */
+/* Display text (primary - prominent) */
 .annotation-text {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--vscode-foreground);
-  opacity: 0.85;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-left: 24px; /* Align with text after icon */
+  line-height: 20px;
+}
+
+/* Annotation ID (secondary - subtle) */
+.annotation-id {
+  font-family: var(--vscode-editor-font-family);
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  margin-top: 4px;
+  padding-left: 30px; /* Align under text */
+  opacity: 0.7;
 }
 
 /* High contrast adjustments */
@@ -154,19 +165,19 @@ body {
   }
   
   .status-icon.accept {
-    color: #00ff00;
+    background-color: #00aa00;
   }
   
   .status-icon.reject {
-    color: #ff0000;
+    background-color: #dd0000;
   }
   
   .status-icon.skip {
-    color: var(--vscode-foreground);
+    background-color: #555;
   }
   
   .status-icon.question {
-    color: #ffff00;
+    background-color: #cc6600;
   }
   
   .annotation-text,
@@ -181,15 +192,15 @@ body.vscode-high-contrast .annotation-item {
 }
 
 body.vscode-high-contrast .status-icon.accept {
-  color: #00ff00;
+  background-color: #00cc00;
 }
 
 body.vscode-high-contrast .status-icon.reject {
-  color: #ff0000;
+  background-color: #ff0000;
 }
 
 body.vscode-high-contrast .status-icon.question {
-  color: #ffff00;
+  background-color: #ff8800;
 }
 
 body.vscode-high-contrast-light .annotation-item {

@@ -4,6 +4,7 @@ import { registerSkillTool } from './tools/skillTool';
 import { registerAnnotateCommand, registerAnnotateWithStatusCommand, registerRevealAnnotationCommand } from './ui/commands';
 import { AnnotationCodeLensProvider, registerCodeLensProvider } from './ui/codelens';
 import { registerAnnotationHoverProvider } from './ui/hover';
+import { registerAnnotationsPanelProvider, registerFocusAnnotationsViewCommand, AnnotationsPanelProvider } from './ui/sidebar';
 
 const OUTPUT_CHANNEL_NAME = 'Markdown Commenter';
 
@@ -75,23 +76,59 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   // Register CodeLens provider for markdown files
+  let codeLensProvider: AnnotationCodeLensProvider | undefined;
   try {
-    const codeLensProvider = new AnnotationCodeLensProvider();
+    codeLensProvider = new AnnotationCodeLensProvider();
     const codeLensDisposable = registerCodeLensProvider(codeLensProvider);
     context.subscriptions.push(codeLensDisposable);
     context.subscriptions.push(codeLensProvider);
 
-    // Set up document change listener to trigger CodeLens refresh
+    outputChannel.appendLine('[INFO] Registered CodeLens provider');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register CodeLens provider: ${error}`);
+  }
+
+  // Register sidebar panel provider for annotations view
+  let sidebarProvider: AnnotationsPanelProvider | undefined;
+  try {
+    sidebarProvider = registerAnnotationsPanelProvider(context);
+    outputChannel.appendLine('[INFO] Registered annotations panel provider');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register annotations panel provider: ${error}`);
+  }
+
+  // Register focus annotations view command (for status bar click)
+  try {
+    const focusCommand = registerFocusAnnotationsViewCommand();
+    context.subscriptions.push(focusCommand);
+    outputChannel.appendLine('[INFO] Registered focus annotations view command');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register focus annotations view command: ${error}`);
+  }
+
+  // Set up shared event listeners for CodeLens and Sidebar updates
+  try {
+    // Document change listener (debounced for sidebar, triggers CodeLens refresh)
     const documentChangeListener = vscode.workspace.onDidChangeTextDocument((event) => {
       if (event.document.languageId === 'markdown') {
-        codeLensProvider.triggerRefresh();
+        // Trigger CodeLens refresh (internal debouncing)
+        codeLensProvider?.triggerRefresh();
+        // Trigger sidebar debounced refresh (300ms per NFR-2)
+        sidebarProvider?.triggerDebouncedRefresh(event.document);
       }
     });
     context.subscriptions.push(documentChangeListener);
 
-    outputChannel.appendLine('[INFO] Registered CodeLens provider');
+    // Active editor change listener (immediate refresh for sidebar)
+    const editorChangeListener = vscode.window.onDidChangeActiveTextEditor((editor) => {
+      // Update sidebar immediately when switching editors
+      sidebarProvider?.updateAnnotations(editor?.document);
+    });
+    context.subscriptions.push(editorChangeListener);
+
+    outputChannel.appendLine('[INFO] Registered document and editor change listeners');
   } catch (error) {
-    outputChannel.appendLine(`[ERROR] Failed to register CodeLens provider: ${error}`);
+    outputChannel.appendLine(`[ERROR] Failed to register change listeners: ${error}`);
   }
 
   outputChannel.appendLine('[INFO] Markdown Commenter extension ready');
