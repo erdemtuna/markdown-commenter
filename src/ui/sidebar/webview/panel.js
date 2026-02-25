@@ -13,12 +13,12 @@
   const placeholder = document.getElementById('placeholder');
   const annotationsList = document.getElementById('annotations-list');
   
-  // Status icons - Fluent UI style SVGs
+  // Status icons - Fluent UI style SVGs (optimized for 14px render)
   const STATUS_ICONS = {
-    'Accept': `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>`,
-    'Reject': `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg>`,
-    'Skip': `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4.25 3a.75.75 0 01.75.75v8.5a.75.75 0 01-1.5 0v-8.5A.75.75 0 014.25 3zm6.5 0a.75.75 0 01.53.22l3.5 3.5a.75.75 0 010 1.06l-3.5 3.5a.75.75 0 01-1.28-.53V8.5H6.75a.75.75 0 010-1.5H10V4.75a.75.75 0 01.22-.53.75.75 0 01.53-.22z"/></svg>`,
-    'Question': `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm9 3a1 1 0 11-2 0 1 1 0 012 0zM6.92 6.085c.081-.16.19-.299.34-.398.145-.097.371-.187.74-.187.28 0 .553.087.738.225.167.126.262.291.262.478 0 .39-.152.616-.525.93l-.084.07c-.392.325-.738.66-.738 1.267v.25a.75.75 0 001.5 0v-.115c0-.134.075-.238.286-.415l.09-.074c.448-.371.897-.793.897-1.563 0-.498-.22-.923-.628-1.234-.396-.302-.918-.463-1.476-.463-.605 0-1.102.163-1.464.429-.37.27-.626.644-.788 1.057a.75.75 0 101.392.556z"/></svg>`,
+    'Accept': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.704 5.296a1 1 0 010 1.408l-8 8a1 1 0 01-1.408 0l-4-4a1 1 0 111.408-1.408L8 12.586l7.296-7.29a1 1 0 011.408 0z" clip-rule="evenodd"/></svg>`,
+    'Reject': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>`,
+    'Skip': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a1 1 0 011 1v10a1 1 0 11-2 0V5a1 1 0 011-1zm12.293.293a1 1 0 011.414 0l.003.003A1 1 0 0118 5v10a1 1 0 01-.293.707l-6 6a1 1 0 01-1.414-1.414L15.586 15H9a1 1 0 110-2h6.586l-5.293-5.293a1 1 0 010-1.414l6-6z"/></svg>`,
+    'Question': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>`,
   };
   
   // Current state

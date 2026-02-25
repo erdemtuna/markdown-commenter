@@ -97,41 +97,47 @@ body {
   gap: 10px;
 }
 
-/* Status icon - Fluent style badge */
+/* Status icon - Fluent style circular badge */
 .status-icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 6px;
+  border-radius: 50%;
 }
 
 .status-icon svg {
   width: 14px;
   height: 14px;
+  display: block;
 }
 
-/* Status colors - vibrant backgrounds */
+/* Status colors - Fluent palette */
 .status-icon.accept {
   color: #fff;
-  background-color: #107c10;
+  background: linear-gradient(135deg, #107c10 0%, #0e6e0e 100%);
+  box-shadow: 0 1px 3px rgba(16, 124, 16, 0.3);
 }
 
 .status-icon.reject {
   color: #fff;
-  background-color: #d13438;
+  background: linear-gradient(135deg, #d13438 0%, #bc2f32 100%);
+  box-shadow: 0 1px 3px rgba(209, 52, 56, 0.3);
 }
 
 .status-icon.skip {
   color: #fff;
-  background-color: #8a8886;
+  background: linear-gradient(135deg, #8a8886 0%, #797775 100%);
+  box-shadow: 0 1px 3px rgba(138, 136, 134, 0.3);
 }
 
 .status-icon.question {
   color: #fff;
-  background-color: #ca5010;
+  background: linear-gradient(135deg, #ca5010 0%, #b5480e 100%);
+  box-shadow: 0 1px 3px rgba(202, 80, 16, 0.3);
 }
 
 /* Display text (primary - prominent) */
