@@ -6,11 +6,16 @@
  */
 
 import * as vscode from 'vscode';
-import type { Annotation } from '../../annotations/types';
-import { generateId, formatAnnotation } from '../../annotations/writer';
-import { truncateForDisplay } from '../utils/truncate';
 import { COMMANDS } from '../constants';
+import { insertAnnotation } from '../utils';
 import type { AnnotateWithStatusArgs } from '../hover/annotationHoverProvider';
+
+/**
+ * Validate that a value is a finite number
+ */
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
 
 /**
  * Execute the annotate with status command
@@ -28,6 +33,13 @@ export async function executeAnnotateWithStatusCommand(
     return;
   }
 
+  // Validate coordinate arguments are finite numbers (MF-4: bounds validation)
+  if (!isFiniteNumber(args.startLine) || !isFiniteNumber(args.startChar) ||
+      !isFiniteNumber(args.endLine) || !isFiniteNumber(args.endChar)) {
+    vscode.window.showErrorMessage('Invalid annotation coordinates');
+    return;
+  }
+
   // Get the active editor
   const editor = vscode.window.activeTextEditor;
   
@@ -42,10 +54,21 @@ export async function executeAnnotateWithStatusCommand(
     return;
   }
 
-  // Reconstruct the selection from the command arguments
+  // Clamp coordinates to document bounds (document may have changed since hover rendered)
+  const maxLine = editor.document.lineCount - 1;
+  const clampedStartLine = Math.max(0, Math.min(args.startLine, maxLine));
+  const clampedEndLine = Math.max(clampedStartLine, Math.min(args.endLine, maxLine));
+  
+  // Clamp character positions to line lengths
+  const startLineLength = editor.document.lineAt(clampedStartLine).text.length;
+  const endLineLength = editor.document.lineAt(clampedEndLine).text.length;
+  const clampedStartChar = Math.max(0, Math.min(args.startChar, startLineLength));
+  const clampedEndChar = Math.max(0, Math.min(args.endChar, endLineLength));
+
+  // Reconstruct the selection from the clamped command arguments
   const selection = new vscode.Selection(
-    new vscode.Position(args.startLine, args.startChar),
-    new vscode.Position(args.endLine, args.endChar)
+    new vscode.Position(clampedStartLine, clampedStartChar),
+    new vscode.Position(clampedEndLine, clampedEndChar)
   );
 
   // Validate the selection is still valid (document may have changed)
@@ -65,38 +88,13 @@ export async function executeAnnotateWithStatusCommand(
     return;
   }
 
-  // Get the selected text for the Re field
-  const selectedText = editor.document.getText(selection);
-  const truncatedRe = truncateForDisplay(selectedText);
-
-  // Build the annotation
-  const annotation: Annotation = {
-    id: generateId(),
+  // Use shared insertion helper (SF-6)
+  await insertAnnotation({
+    editor,
+    selection,
     status: args.status,
-    re: truncatedRe,
-    comment: comment || undefined, // Don't include empty string
-  };
-
-  // Format the annotation block
-  const annotationBlock = formatAnnotation(annotation);
-
-  // Calculate insertion position (after the selection's end line)
-  const insertLine = selection.end.line;
-
-  // Apply the edit
-  const success = await editor.edit((editBuilder) => {
-    // Insert the annotation after the selection line
-    const endOfLine = editor.document.lineAt(insertLine).range.end;
-    editBuilder.insert(endOfLine, '\n\n' + annotationBlock + '\n');
+    comment: comment || undefined,
   });
-
-  if (success) {
-    // Move cursor to after the inserted annotation for better UX
-    // This also clears the selection, which hides the hover
-    const newLineCount = annotationBlock.split('\n').length + 2; // +2 for blank lines
-    const newPosition = new vscode.Position(insertLine + newLineCount, 0);
-    editor.selection = new vscode.Selection(newPosition, newPosition);
-  }
 }
 
 /**

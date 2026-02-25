@@ -15,7 +15,7 @@
 import * as vscode from 'vscode';
 import { AnnotatedBlock } from '../../annotations/types';
 import { findAnnotations } from '../../annotations';
-import { VIEWS, COMMANDS, DEBOUNCE_DELAY_MS } from '../constants';
+import { VIEWS, COMMANDS, DEBOUNCE_DELAY_MS, LARGE_FILE_THRESHOLD } from '../constants';
 import { truncateForDisplay } from '../utils';
 
 /**
@@ -108,6 +108,16 @@ export class AnnotationsPanelProvider implements vscode.WebviewViewProvider, vsc
       return;
     }
     
+    // SF-5: Skip large files to prevent performance issues
+    const fileSize = Buffer.byteLength(document.getText(), 'utf8');
+    if (fileSize > LARGE_FILE_THRESHOLD) {
+      this._view.webview.postMessage({
+        type: 'setPlaceholder',
+        message: 'File too large to parse annotations (>10MB)',
+      });
+      return;
+    }
+    
     try {
       const content = document.getText();
       const blocks = findAnnotations(content);
@@ -193,10 +203,15 @@ export class AnnotationsPanelProvider implements vscode.WebviewViewProvider, vsc
       return;
     }
     
+    // SF-3: Clamp line numbers to document bounds (data may be stale from debounce)
+    const maxLine = editor.document.lineCount - 1;
+    const clampedStartLine = Math.max(0, Math.min(startLine, maxLine));
+    const clampedEndLine = Math.max(clampedStartLine, Math.min(endLine, maxLine));
+    
     // Create selection spanning the entire annotation block
-    const startPos = new vscode.Position(startLine, 0);
-    const endLineText = editor.document.lineAt(endLine);
-    const endPos = new vscode.Position(endLine, endLineText.text.length);
+    const startPos = new vscode.Position(clampedStartLine, 0);
+    const endLineText = editor.document.lineAt(clampedEndLine);
+    const endPos = new vscode.Position(clampedEndLine, endLineText.text.length);
     
     // Reveal and select
     editor.selection = new vscode.Selection(startPos, endPos);

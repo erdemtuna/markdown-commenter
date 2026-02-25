@@ -121,14 +121,20 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Set up shared event listeners for CodeLens, Sidebar, and Status Bar updates
   try {
-    // Document change listener (debounced for sidebar, triggers CodeLens and status bar refresh)
+    // Document change listener (debounced for sidebar and status bar, triggers CodeLens refresh)
     const documentChangeListener = vscode.workspace.onDidChangeTextDocument((event) => {
       if (event.document.languageId === 'markdown') {
+        // SF-4: Only update if the changed document is the active editor's document
+        // This prevents wrong-document content being shown
+        if (event.document !== vscode.window.activeTextEditor?.document) {
+          return;
+        }
+        
         // Trigger CodeLens refresh (internal debouncing)
         codeLensProvider?.triggerRefresh();
         // Trigger sidebar debounced refresh (300ms per NFR-2)
         sidebarProvider?.triggerDebouncedRefresh(event.document);
-        // Update status bar count (immediate - lightweight operation)
+        // Update status bar count (debounced per SF-2)
         statusBar?.update(event.document);
       }
     });
@@ -138,8 +144,8 @@ export async function activate(context: vscode.ExtensionContext) {
     const editorChangeListener = vscode.window.onDidChangeActiveTextEditor((editor) => {
       // Update sidebar immediately when switching editors
       sidebarProvider?.updateAnnotations(editor?.document);
-      // Update status bar count
-      statusBar?.update(editor?.document);
+      // Update status bar count (immediate on editor switch)
+      statusBar?.update(editor?.document, true);
     });
     context.subscriptions.push(editorChangeListener);
 

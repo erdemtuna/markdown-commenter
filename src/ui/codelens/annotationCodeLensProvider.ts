@@ -8,7 +8,7 @@
 import * as vscode from 'vscode';
 import { findAnnotations } from '../../annotations/parser';
 import type { AnnotatedBlock } from '../../annotations/types';
-import { STATUS_CODICONS, COMMANDS, DEBOUNCE_DELAY_MS } from '../constants';
+import { STATUS_CODICONS, COMMANDS, DEBOUNCE_DELAY_MS, LARGE_FILE_THRESHOLD } from '../constants';
 
 /**
  * CodeLens provider that shows status indicators above annotation blocks
@@ -48,7 +48,13 @@ export class AnnotationCodeLensProvider implements vscode.CodeLensProvider {
       return [];
     }
 
+    // SF-5: Skip large files to prevent performance issues
     const content = document.getText();
+    const fileSize = Buffer.byteLength(content, 'utf8');
+    if (fileSize > LARGE_FILE_THRESHOLD) {
+      return [];
+    }
+
     const blocks = findAnnotations(content);
 
     return blocks.map((block) => this.createCodeLens(block, document));

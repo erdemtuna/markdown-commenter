@@ -32,8 +32,10 @@ function buildCommandLink(status: Verdict, selection: vscode.Selection): string 
     endChar: selection.end.character,
   };
   
-  // Encode arguments as JSON in the command URI
-  const encodedArgs = encodeURIComponent(JSON.stringify(args));
+  // Encode arguments as JSON array in the command URI
+  // VS Code command URIs deserialize the query string as a JSON array,
+  // spreading elements as positional arguments to the command handler
+  const encodedArgs = encodeURIComponent(JSON.stringify([args]));
   const icon = STATUS_UNICODE[status];
   
   return `[${icon} ${status}](command:${COMMANDS.ANNOTATE_WITH_STATUS}?${encodedArgs})`;

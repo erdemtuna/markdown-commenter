@@ -10,10 +10,9 @@
  */
 
 import * as vscode from 'vscode';
-import type { Verdict, Annotation } from '../../annotations/types';
-import { generateId, formatAnnotation } from '../../annotations/writer';
-import { truncateForDisplay } from '../utils/truncate';
+import type { Verdict } from '../../annotations/types';
 import { STATUS_CODICONS, LARGE_FILE_THRESHOLD, COMMANDS } from '../constants';
+import { insertAnnotation } from '../utils';
 
 /**
  * Quick-pick item with associated verdict value
@@ -108,38 +107,13 @@ export async function executeAnnotateCommand(
     return;
   }
 
-  // Get the selected text for the Re field
-  const selectedText = editor.document.getText(selection);
-  const truncatedRe = truncateForDisplay(selectedText);
-
-  // Build the annotation
-  const annotation: Annotation = {
-    id: generateId(),
+  // Use shared insertion helper (SF-6)
+  await insertAnnotation({
+    editor,
+    selection,
     status: statusPick.verdict,
-    re: truncatedRe,
-    comment: comment || undefined, // Don't include empty string
-  };
-
-  // Format the annotation block
-  const annotationBlock = formatAnnotation(annotation);
-
-  // Calculate insertion position (after the selection's end line)
-  const insertLine = selection.end.line;
-
-  // Apply the edit
-  const success = await editor.edit((editBuilder) => {
-    // Insert the annotation after the selection line
-    // We insert at the beginning of the next line with proper spacing
-    const endOfLine = editor.document.lineAt(insertLine).range.end;
-    editBuilder.insert(endOfLine, '\n\n' + annotationBlock + '\n');
+    comment: comment || undefined,
   });
-
-  if (success) {
-    // Move cursor to after the inserted annotation for better UX
-    const newLineCount = annotationBlock.split('\n').length + 2; // +2 for blank lines
-    const newPosition = new vscode.Position(insertLine + newLineCount, 0);
-    editor.selection = new vscode.Selection(newPosition, newPosition);
-  }
 }
 
 /**
