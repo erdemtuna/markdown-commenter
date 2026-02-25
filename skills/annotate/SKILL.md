@@ -72,7 +72,10 @@ For each identified item, present it to the user:
 
 **1** Accept | **2** Reject | **3** Skip | **4** Question
 
-Enter: number, or number - your comment/question
+Examples:
+  1           → Accept
+  2 - wrong   → Reject with comment
+  4 - why?    → Ask question, then decide
 ```
 
 **Input format:**
