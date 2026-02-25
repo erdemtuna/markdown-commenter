@@ -1,0 +1,55 @@
+{
+  "name": "markdown-commenter",
+  "displayName": "Markdown Commenter",
+  "description": "AI-assisted markdown annotation with Copilot CLI skill and VS Code Chat agent",
+  "version": "0.0.1-dev",
+  "publisher": "erdem-tuna",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erdem-tuna/markdown-commenter"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Markdown Commenter",
+      "properties": {
+        "markdownCommenter.promptDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Custom directory for agent installation. Leave empty to use platform default."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^2.22.0",
+    "eslint": "^8.56.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.3.3"
+  }
+}

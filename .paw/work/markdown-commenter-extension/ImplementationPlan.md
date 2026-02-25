@@ -49,7 +49,7 @@ A publishable VS Code extension AND CLI package where:
 
 ## Phase Status
 
-- [ ] **Phase 1: Extension Shell** - Package structure, activation, build tooling
+- [x] **Phase 1: Extension Shell** - Package structure, activation, build tooling
 - [ ] **Phase 2: TypeScript Annotation Utilities** - Parser, writer, types for `> [!COMMENT]` blocks
 - [ ] **Phase 3: Skill and Agent Content** - SKILL.md and .agent.md files with conditional blocks
 - [ ] **Phase 4: Skill/Agent Infrastructure** - Loader, installer, Language Model Tools
@@ -101,10 +101,10 @@ Establish the VS Code extension foundation: package manifest, entry point, TypeS
 ### Success Criteria
 
 #### Automated Verification:
-- [ ] `npm install` completes without errors
-- [ ] `npm run compile` produces `out/extension.js` without TypeScript errors
-- [ ] `npm run lint` passes with no errors
-- [ ] `npm test` passes (activation test)
+- [x] `npm install` completes without errors
+- [x] `npm run compile` produces `out/extension.js` without TypeScript errors
+- [x] `npm run lint` passes with no errors
+- [x] `npm test` passes (activation test)
 
 #### Manual Verification:
 - [ ] Extension loads in VS Code Extension Development Host (F5)
