@@ -30,20 +30,14 @@ Use GitHub-style callout blocks for annotations:
 
 ### 1. Setup
 
-Before starting annotation, ask the user:
+Before starting annotation, ask the user using **choice-based input** (ask_user tool with choices, NOT text input):
 
-```
-📄 **Output Mode**
+**Question**: "Where should I write annotations?"
+**Choices**:
+- "Original file (modify in-place)"
+- "Separate file (.annotate/ folder)"
 
-Where should I write annotations?
-
-**1** Original file (modify in-place)
-**2** Separate file (`.annotate/` folder, preserves original)
-
-Enter 1 or 2:
-```
-
-If user selects **2** (separate file):
+If user selects **separate file**:
 - Create `.annotate/` folder in the same directory as the source file
 - Copy the original file to `.annotate/<filename>`
 - All annotations go into the copy, original stays untouched
