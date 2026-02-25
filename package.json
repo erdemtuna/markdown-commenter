@@ -28,6 +28,11 @@
         "icon": "$(comment)"
       },
       {
+        "command": "markdown-commenter.annotateWithStatus",
+        "title": "Annotate with Status",
+        "category": "Markdown Commenter"
+      },
+      {
         "command": "markdown-commenter.revealAnnotation",
         "title": "Reveal Annotation",
         "category": "Markdown Commenter"
@@ -119,5 +124,9 @@
     "eslint": "^8.56.0",
     "mocha": "^10.2.0",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@fluentui/tokens": "^1.0.0-alpha.23",
+    "@fluentui/web-components": "^2.6.1"
   }
 }

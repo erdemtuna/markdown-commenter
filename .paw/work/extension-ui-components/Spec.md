@@ -8,7 +8,7 @@ Add interactive UI elements to the Markdown Commenter VS Code extension, enablin
 2. **CodeLens** — Inline status indicators above annotated lines  
 3. **Sidebar Panel** — File-level annotation list and navigation
 
-**Design principle**: Use Fluent UI components (`@vscode/webview-ui-toolkit`) for a sleek, modern interface that matches VS Code's native aesthetics. All UI should feel native to VS Code, not bolted-on.
+**Design principle**: Use Fluent 2 Web Components (`@fluentui/web-components` + `@fluentui/tokens`) for a sleek, modern interface that matches VS Code's native aesthetics. All UI should feel native to VS Code, not bolted-on.
 
 ---
 
@@ -23,6 +23,14 @@ Add interactive UI elements to the Markdown Commenter VS Code extension, enablin
 **US-3**: As a user, I want to optionally add a comment after selecting a status, so I can explain my reasoning.
 
 **US-4**: As a user, I want the annotation to appear immediately after the line containing my selection, so I can see it in context.
+
+### Hover-based Annotation UI
+
+**US-12**: As a user, I want to see a hover near my text selection with clickable status buttons, so I can annotate contextually without keyboard shortcuts.
+
+**US-13**: As a user, I want clicking a status button in the hover to either insert the annotation immediately (for quick verdicts) or show a comment input (for detailed annotations), so I can choose my workflow.
+
+**US-14**: As a user, I want the hover to remain visible while I interact with it, so I have time to click the desired button.
 
 ### CodeLens
 
@@ -65,6 +73,24 @@ Add interactive UI elements to the Markdown Commenter VS Code extension, enablin
 - [ ] When invoked without selection or in non-markdown file, shows informative message
 - [ ] Quick-pick closes immediately after selection (single annotation per invocation)
 
+### FR-1B: Hover-based Annotation UI
+
+**Description**: Display a contextual hover near text selection with clickable status buttons for quick annotation.
+
+**Acceptance Criteria**:
+- [ ] `HoverProvider` registered for markdown files
+- [ ] When text is selected in a markdown file, hover appears at selection position
+- [ ] Hover displays clickable buttons: `✓ Accept | ✗ Reject | ⏭ Skip | ? Question`
+- [ ] Each button is a markdown command link that triggers annotation with pre-selected status
+- [ ] Clicking a button:
+  - Shows Quick-pick for optional comment input only (status already selected)
+  - If comment is empty or skipped, annotation is inserted immediately
+  - If comment is provided, annotation includes the comment
+- [ ] Hover uses VS Code markdown syntax with command URIs
+- [ ] Selection range is passed via command arguments to ensure correct text is annotated
+- [ ] Existing `Ctrl+Shift+A` flow remains as fallback (unchanged)
+- [ ] Hover appears at cursor/selection position (contextual, near the text)
+
 ### FR-2: CodeLens Provider
 
 **Description**: Display CodeLens indicators above lines that precede annotation blocks.
@@ -97,7 +123,7 @@ Add interactive UI elements to the Markdown Commenter VS Code extension, enablin
   - Annotations are added/modified/deleted in current file
 - [ ] Panel shows "No annotations" placeholder when file has no annotations
 - [ ] Panel shows "Open a markdown file" when no markdown file is active
-- [ ] Panel uses Fluent UI components from `@vscode/webview-ui-toolkit`
+- [ ] Panel uses Fluent 2 Web Components (`@fluentui/web-components` with `@fluentui/tokens` for theming)
 
 ### FR-4: Context Menu Integration
 
@@ -105,7 +131,7 @@ Add interactive UI elements to the Markdown Commenter VS Code extension, enablin
 
 **Acceptance Criteria**:
 - [ ] "Add Annotation" appears in editor context menu when right-clicking in markdown files
-- [ ] Context menu item is disabled when no text is selected
+- [ ] Context menu item is hidden when no text is selected (VS Code menus use show/hide, not disable)
 - [ ] Context menu item invokes same flow as Quick-pick command (FR-1)
 
 ### FR-5: Status Bar Integration
@@ -124,11 +150,11 @@ Add interactive UI elements to the Markdown Commenter VS Code extension, enablin
 
 ### NFR-1: Visual Design
 
-**Description**: UI must follow VS Code's design language using Fluent UI components.
+**Description**: UI must follow VS Code's design language using Fluent 2 Web Components.
 
 **Acceptance Criteria**:
-- [ ] Install `@vscode/webview-ui-toolkit` as dependency
-- [ ] Sidebar panel uses Fluent UI components: `vscode-data-grid`, `vscode-button`, `vscode-badge`
+- [ ] Install `@fluentui/web-components` and `@fluentui/tokens` as dependencies
+- [ ] Sidebar panel uses Fluent 2 components (e.g., `fluent-data-grid`, `fluent-button`, `fluent-badge`)
 - [ ] Colors match VS Code theme (respects light/dark/high-contrast themes)
 - [ ] Icons use VS Code's codicon set where available
 - [ ] Custom icons (if needed) follow VS Code icon design guidelines
@@ -255,7 +281,7 @@ A successful implementation should support this workflow:
 | Verdict | One of four status values: Accept, Reject, Skip, Question |
 | CodeLens | VS Code feature showing actionable links above lines of code |
 | Quick-pick | VS Code's native selection UI (dropdown list) |
-| Fluent UI | Microsoft's design system; `@vscode/webview-ui-toolkit` provides VS Code-themed components |
+| Fluent UI | Microsoft's Fluent 2 design system; `@fluentui/web-components` provides web components with `@fluentui/tokens` for theming |
 | Re field | Truncated quote of the annotated text, used for reference durability |
 
 ---
@@ -265,5 +291,5 @@ A successful implementation should support this workflow:
 - [WorkShaping.md](/WorkShaping.md) — Initial design document with annotation format specification
 - [VS Code CodeLens API](https://code.visualstudio.com/api/references/vscode-api#CodeLensProvider)
 - [VS Code Webview API](https://code.visualstudio.com/api/extension-guides/webview)
-- [@vscode/webview-ui-toolkit](https://github.com/microsoft/vscode-webview-ui-toolkit)
+- [Fluent 2 Web Components](https://fluent2.microsoft.design/get-started/develop) (`@fluentui/web-components`)
 - [VS Code Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)

@@ -9,6 +9,7 @@ import type { Verdict } from '../annotations/types';
  */
 export const COMMANDS = {
   ANNOTATE: 'markdown-commenter.annotate',
+  ANNOTATE_WITH_STATUS: 'markdown-commenter.annotateWithStatus',
   REVEAL_ANNOTATION: 'markdown-commenter.revealAnnotation',
   FOCUS_ANNOTATIONS_VIEW: 'markdown-commenter.focusAnnotationsView',
 } as const;

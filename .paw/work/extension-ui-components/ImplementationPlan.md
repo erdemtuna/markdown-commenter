@@ -60,6 +60,7 @@ Design follows VS Code's native aesthetics using Fluent 2 Web Components (`@flue
 - [x] **Phase 1: Foundation & Package Configuration** - Set up dependencies, commands, views, and keybindings in package.json
 - [x] **Phase 2: Quick-pick Annotation Command** - Implement core annotation workflow with status selection and comment input
 - [x] **Phase 3: CodeLens Provider** - Display status indicators above annotation blocks with click handling
+- [x] **Phase 2B: Hover-based Annotation UI** - Contextual hover with clickable status buttons near text selection
 - [ ] **Phase 4: Sidebar Panel** - Webview-based annotation list with navigation and real-time updates
 - [ ] **Phase 5: Status Bar & Polish** - Annotation count display and cross-component integration
 - [ ] **Phase 6: Documentation** - README, CHANGELOG, and Docs.md updates
@@ -218,6 +219,75 @@ Display status indicators above annotation blocks with click-to-reveal functiona
 - [ ] Non-markdown file → No CodeLens shown
 - [ ] File with malformed annotation block → CodeLens shows for valid blocks, no crash
 - [ ] Rapid editing (10 changes in 1 second) → CodeLens updates without blocking editor
+
+---
+
+## Phase 2B: Hover-based Annotation UI
+
+### Objective
+Improve annotation UX by showing a contextual hover near text selection with clickable status buttons. This keeps the interaction near the selection rather than requiring keyboard shortcuts or command palette navigation.
+
+### Changes Required
+
+- **`src/ui/constants.ts`**: Add new command identifier
+  ```typescript
+  export const COMMANDS = {
+    ANNOTATE: 'markdown-commenter.annotate',
+    ANNOTATE_WITH_STATUS: 'markdown-commenter.annotateWithStatus', // NEW
+    // ... existing
+  };
+  ```
+
+- **`src/ui/hover/annotationHoverProvider.ts`**: Implement `HoverProvider`
+  - `provideHover()`: Generate hover content when text is selected in markdown
+  - Build markdown content with command links for each status:
+    ```markdown
+    [✓ Accept](command:markdown-commenter.annotateWithStatus?{"status":"Accept","startLine":N,"startChar":M,...})
+    ```
+  - Pass selection range via JSON-encoded command arguments
+  - Return `Hover` positioned at selection
+  - Return `null` if no selection (hover only when text selected)
+
+- **`src/ui/hover/index.ts`**: Export provider and registration helper
+
+- **`src/ui/commands/annotateWithStatusCommand.ts`**: Implement status-specific annotation
+  - Accept `{ status: Verdict, startLine, startChar, endLine, endChar }` arguments
+  - Show input box for optional comment only (status already selected)
+  - Build annotation with provided status
+  - Insert annotation after selection
+  - Reuse truncation and insertion logic from `annotateCommand.ts`
+
+- **`package.json`**: Register new command
+  ```json
+  {
+    "command": "markdown-commenter.annotateWithStatus",
+    "title": "Annotate with Status",
+    "category": "Markdown Commenter"
+  }
+  ```
+
+- **`src/extension.ts`**: Register hover provider and new command
+  - Use `vscode.languages.registerHoverProvider()` with markdown selector
+  - Register `annotateWithStatus` command
+  - Add disposables to subscriptions
+
+### Success Criteria
+
+#### Automated Verification:
+- [ ] `npm run compile` succeeds
+- [ ] `npm run lint` passes
+- [ ] `npm test` passes (no regressions)
+
+#### Manual Verification:
+- [ ] Select text in markdown file → Hover appears with status buttons
+- [ ] Hover shows: `✓ Accept | ✗ Reject | ⏭ Skip | ? Question`
+- [ ] Click "Accept" → Input box appears for optional comment
+- [ ] Enter comment → Annotation inserted with Accept status and comment
+- [ ] Press Enter with empty comment → Annotation inserted with Accept status, no comment
+- [ ] Press Escape → Operation cancelled
+- [ ] Hover buttons work for all statuses (Reject, Skip, Question)
+- [ ] Existing `Ctrl+Shift+A` flow still works (unchanged)
+- [ ] Hover only appears when text is selected (not on empty cursor)
 
 ---
 

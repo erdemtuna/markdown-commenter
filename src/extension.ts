@@ -1,8 +1,14 @@
 import * as vscode from 'vscode';
 import { installAgentsIfNeeded } from './agents/installer';
 import { registerSkillTool } from './tools/skillTool';
-import { registerAnnotateCommand, registerRevealAnnotationCommand } from './ui/commands';
+import { registerAnnotateCommand, registerAnnotateWithStatusCommand, registerRevealAnnotationCommand } from './ui/commands';
 import { AnnotationCodeLensProvider, registerCodeLensProvider } from './ui/codelens';
+import { registerAnnotationHoverProvider } from './ui/hover';
+import {
+  registerAnnotationsPanelProvider,
+  registerFocusAnnotationsViewCommand,
+  AnnotationsPanelProvider,
+} from './ui/sidebar';
 
 const OUTPUT_CHANNEL_NAME = 'Markdown Commenter';
 
@@ -46,6 +52,24 @@ export async function activate(context: vscode.ExtensionContext) {
     outputChannel.appendLine(`[ERROR] Failed to register annotate command: ${error}`);
   }
 
+  // Register annotate with status command (for hover UI)
+  try {
+    const annotateWithStatusCommand = registerAnnotateWithStatusCommand();
+    context.subscriptions.push(annotateWithStatusCommand);
+    outputChannel.appendLine('[INFO] Registered annotate with status command');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register annotate with status command: ${error}`);
+  }
+
+  // Register hover provider for contextual annotation UI
+  try {
+    const hoverDisposable = registerAnnotationHoverProvider();
+    context.subscriptions.push(hoverDisposable);
+    outputChannel.appendLine('[INFO] Registered annotation hover provider');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register annotation hover provider: ${error}`);
+  }
+
   // Register reveal annotation command (for CodeLens click)
   try {
     const revealCommand = registerRevealAnnotationCommand();
@@ -73,6 +97,41 @@ export async function activate(context: vscode.ExtensionContext) {
     outputChannel.appendLine('[INFO] Registered CodeLens provider');
   } catch (error) {
     outputChannel.appendLine(`[ERROR] Failed to register CodeLens provider: ${error}`);
+  }
+
+  // Register Annotations sidebar panel
+  let panelProvider: AnnotationsPanelProvider | undefined;
+  try {
+    panelProvider = registerAnnotationsPanelProvider(context);
+    outputChannel.appendLine('[INFO] Registered Annotations panel provider');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register Annotations panel provider: ${error}`);
+  }
+
+  // Register focus annotations view command
+  try {
+    const focusCommand = registerFocusAnnotationsViewCommand();
+    context.subscriptions.push(focusCommand);
+    outputChannel.appendLine('[INFO] Registered focus annotations view command');
+  } catch (error) {
+    outputChannel.appendLine(`[ERROR] Failed to register focus annotations view command: ${error}`);
+  }
+
+  // Set up listeners for sidebar panel updates
+  if (panelProvider) {
+    // Immediate update when active editor changes
+    const editorChangeListener = vscode.window.onDidChangeActiveTextEditor((editor) => {
+      panelProvider!.updateAnnotations(editor?.document);
+    });
+    context.subscriptions.push(editorChangeListener);
+
+    // Debounced update when document content changes
+    const documentChangeListenerForPanel = vscode.workspace.onDidChangeTextDocument((event) => {
+      if (event.document.languageId === 'markdown') {
+        panelProvider!.triggerDebouncedRefresh(event.document);
+      }
+    });
+    context.subscriptions.push(documentChangeListenerForPanel);
   }
 
   outputChannel.appendLine('[INFO] Markdown Commenter extension ready');
