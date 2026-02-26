@@ -14,7 +14,15 @@
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "markdown",
+    "annotation",
+    "comments",
+    "ai",
+    "copilot"
   ],
   "activationEvents": [
     "onStartupFinished"

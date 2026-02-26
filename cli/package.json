@@ -30,5 +30,8 @@
     "markdown",
     "annotation",
     "cli"
-  ]
+  ],
+  "dependencies": {
+    "@erdemtuna/markdown-commenter": "^0.1.1"
+  }
 }

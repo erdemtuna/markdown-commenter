@@ -109,17 +109,17 @@ jobs:
           name: CLI ${{ steps.version.outputs.version }}
           tag_name: ${{ github.ref_name }}
           body: |
-            Published to npm: `@erdem-tuna/markdown-commenter@${{ steps.version.outputs.version }}`
+            Published to npm: `@erdemtuna/markdown-commenter@${{ steps.version.outputs.version }}`
             
             ## Installation
             
             ```bash
-            npx @erdem-tuna/markdown-commenter install copilot
+            npx @erdemtuna/markdown-commenter install copilot
             ```
             
             Or install globally:
             ```bash
-            npm install -g @erdem-tuna/markdown-commenter
+            npm install -g @erdemtuna/markdown-commenter
             markdown-commenter install copilot
             ```
             
