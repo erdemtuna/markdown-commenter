@@ -1,0 +1,78 @@
+# Runs automated quality checks on pull requests before merging.
+# Validates code quality by running linting, compilation, tests, and agent file checks.
+# Serves as a quality gate to prevent broken code or oversized agent files from being merged.
+#
+# Path filtering ensures workflow only runs when relevant files change.
+# Uses xvfb for headless VS Code extension testing.
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'agents/**'
+      - 'skills/**'
+      - 'cli/**'
+      - 'scripts/**'
+      - '.github/workflows/pr-checks.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint code
+        run: npm run lint
+      
+      - name: Compile extension
+        run: npm run compile
+      
+      - name: Run extension unit tests
+        run: |
+          # Install xvfb for headless VS Code testing
+          # xvfb provides a virtual display server, required for VS Code's Electron environment
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          
+          # Run tests with virtual display
+          # xvfb-run -a automatically finds an available display number
+          xvfb-run -a npm test
+        env:
+          # Prevent VS Code from showing UI during tests
+          DISPLAY: ':99.0'
+      
+      - name: Install CLI dependencies
+        run: cd cli && npm ci
+      
+      - name: Run CLI tests
+        # Note: Currently no test files exist in cli/lib/*.test.js
+        # This step will pass vacuously until CLI tests are added
+        run: cd cli && npm test
+      
+      - name: Lint agent files
+        run: npm run lint:agent:all
+      
+      - name: PR checks summary
+        if: success()
+        run: |
+          echo "✅ All PR checks passed!"
+          echo "- Code linting: PASSED"
+          echo "- Compilation: PASSED"
+          echo "- Extension tests: PASSED"
+          echo "- CLI tests: PASSED"
+          echo "- Agent linting: PASSED"
