@@ -60,9 +60,14 @@ jobs:
         run: cd cli && npm ci
       
       - name: Run CLI tests
-        # Note: Currently no test files exist in cli/lib/*.test.js
-        # This step will pass vacuously until CLI tests are added
-        run: cd cli && npm test
+        run: |
+          cd cli
+          # Check if test files exist before running
+          if ls lib/*.test.js 1> /dev/null 2>&1; then
+            npm test
+          else
+            echo "No CLI test files found (lib/*.test.js) - skipping"
+          fi
       
       - name: Lint agent files
         run: npm run lint:agent:all
