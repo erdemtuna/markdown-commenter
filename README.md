@@ -135,7 +135,14 @@ npm run compile
 ### Run tests
 
 ```bash
-npm test
+npm test                   # Extension tests
+cd cli && npm test         # CLI tests
+```
+
+### Lint agent files
+
+```bash
+npm run lint:agent:all     # Lint agents and skills for token limits
 ```
 
 ### Package extension
@@ -143,6 +150,15 @@ npm test
 ```bash
 npm run package
 ```
+
+### Release process
+
+Releases are automated via GitHub Actions:
+
+- **Extension**: Push a `v*` tag (e.g., `git tag v1.0.0 && git push origin v1.0.0`)
+- **CLI**: Push a `cli-v*` tag (e.g., `git tag cli-v1.0.0 && git push origin cli-v1.0.0`)
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for maintainer setup (secrets, first-time publish, etc.).
 
 ## Contributing
 

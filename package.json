@@ -5,6 +5,7 @@
   "version": "0.0.1-dev",
   "publisher": "erdem-tuna",
   "license": "MIT",
+  "icon": "images/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/erdem-tuna/markdown-commenter"
@@ -119,9 +120,13 @@
     "cli:build": "cd cli && npm run build",
     "cli:link": "cd cli && npm link",
     "cli:install-local": "npm run cli:build && node cli/bin/cli.js install copilot",
-    "cli:reinstall": "node cli/bin/cli.js uninstall; rm -rf ~/.paw/markdown-commenter; npm run cli:install-local"
+    "cli:reinstall": "node cli/bin/cli.js uninstall; rm -rf ~/.paw/markdown-commenter; npm run cli:install-local",
+    "lint:agent": "./scripts/lint-prompting.sh",
+    "lint:agent:all": "./scripts/lint-prompting.sh --all",
+    "lint:skills": "./scripts/lint-prompting.sh --skills"
   },
   "devDependencies": {
+    "@dqbd/tiktoken": "^1.0.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.0",

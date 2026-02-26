@@ -12,5 +12,10 @@ export function truncateForDisplay(text: string, maxLength = 50): string {
     return normalized;
   }
   
+  // Minimum meaningful maxLength is 3 (for "...")
+  if (maxLength < 3) {
+    return '...'.slice(0, maxLength);
+  }
+  
   return normalized.slice(0, maxLength - 3) + '...';
 }
