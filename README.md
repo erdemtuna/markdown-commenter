@@ -42,7 +42,7 @@ code --install-extension erdem-tuna.markdown-commenter
 For terminal users with GitHub Copilot CLI:
 
 ```bash
-npx @erdem-tuna/markdown-commenter install copilot
+npx @erdemtuna/markdown-commenter install copilot
 ```
 
 This installs the annotation agent and skill to `~/.copilot/`.
@@ -118,8 +118,8 @@ Platform defaults:
 ### CLI installation issues
 
 1. Verify Node.js 18+: `node --version`
-2. Check installation: `npx @erdem-tuna/markdown-commenter list`
-3. Reinstall: `npx @erdem-tuna/markdown-commenter uninstall && npx @erdem-tuna/markdown-commenter install copilot`
+2. Check installation: `npx @erdemtuna/markdown-commenter list`
+3. Reinstall: `npx @erdemtuna/markdown-commenter uninstall && npx @erdemtuna/markdown-commenter install copilot`
 
 ## Development
 

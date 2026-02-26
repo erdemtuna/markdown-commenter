@@ -7,7 +7,7 @@ CLI installer for the Markdown Commenter Copilot skill and agent.
 Install to GitHub Copilot CLI:
 
 ```bash
-npx @erdem-tuna/markdown-commenter install copilot
+npx @erdemtuna/markdown-commenter install copilot
 ```
 
 This installs:
