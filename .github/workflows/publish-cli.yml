@@ -1,0 +1,126 @@
+# Publishes the CLI package to npm when CLI version tags are pushed.
+# Triggers on tags matching cli-v* pattern (e.g., cli-v1.0.0, cli-v0.2.0-beta).
+# Builds, tests, publishes to npm with provenance, and creates GitHub Release.
+#
+# Pre-release convention: versions with -alpha, -beta, or -rc suffix are pre-releases
+# and are published to npm with the 'beta' tag instead of 'latest'.
+#
+# AUTHENTICATION:
+# Uses npm OIDC (OpenID Connect) for secure publishing without storing tokens.
+# This requires the package to be configured for provenance on npmjs.com.
+#
+# PREREQUISITES (one-time setup):
+# 1. Package must be published manually first time with: npm publish --access public
+# 2. On npmjs.com, link the package to the GitHub repository
+# 3. Enable "Require two-factor authentication or an automation token or granular access token"
+# 4. In cli/package.json, add: "publishConfig": { "provenance": true }
+#
+# No NPM_TOKEN secret is needed - OIDC handles authentication via id-token permission.
+name: Publish CLI
+
+on:
+  push:
+    tags:
+      - 'cli-v*'
+
+permissions:
+  id-token: write  # Required for OIDC trusted publishing to npm
+  contents: write  # Required to create GitHub releases
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cli
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Using Node 20 for consistency with extension workflow
+          # PAW uses Node 24, but 20 is sufficient and more stable
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          VERSION="${TAG_NAME#cli-v}"  # Remove 'cli-v' prefix
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Extracted version: ${VERSION}"
+      
+      - name: Determine pre-release status
+        id: prerelease
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          # Check for pre-release suffixes: -alpha, -beta, -rc
+          # Examples: 1.0.0-beta, 0.2.0-alpha.1, 1.0.0-rc.1
+          if [[ "$VERSION" =~ -(alpha|beta|rc) ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "npm_tag=beta" >> $GITHUB_OUTPUT
+            echo "This is a pre-release version"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "npm_tag=latest" >> $GITHUB_OUTPUT
+            echo "This is a stable release version"
+          fi
+      
+      - name: Set version from tag
+        run: npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build distribution
+        run: npm run build
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Publish to npm
+        run: npm publish --access public --tag ${{ steps.prerelease.outputs.npm_tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Check if release exists
+        id: check_release
+        working-directory: ${{ github.workspace }}
+        run: |
+          RELEASE_EXISTS=$(gh release view "${{ github.ref_name }}" --json id 2>/dev/null || echo "")
+          if [ -n "$RELEASE_EXISTS" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          name: CLI ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          body: |
+            Published to npm: `@erdem-tuna/markdown-commenter@${{ steps.version.outputs.version }}`
+            
+            ## Installation
+            
+            ```bash
+            npx @erdem-tuna/markdown-commenter install copilot
+            ```
+            
+            Or install globally:
+            ```bash
+            npm install -g @erdem-tuna/markdown-commenter
+            markdown-commenter install copilot
+            ```
+            
+            Release notes will be added by the release preparation process.
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
