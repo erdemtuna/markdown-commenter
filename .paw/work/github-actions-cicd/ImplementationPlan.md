@@ -49,11 +49,11 @@ Implementing automated CI/CD infrastructure for markdown-commenter, consisting o
 
 ## Phase Status
 
-- [ ] **Phase 1: Token Linting Infrastructure** - Add scripts and dependencies for agent/skill token validation
-- [ ] **Phase 2: PR Checks Workflow** - Automated quality gates on pull requests
-- [ ] **Phase 3: Extension Release Workflow** - Tag-triggered VSIX build, GitHub Release, and Marketplace publishing
-- [ ] **Phase 4: CLI Publish Workflow** - Tag-triggered npm publish with OIDC
-- [ ] **Phase 5: Documentation** - Technical reference and README updates
+- [x] **Phase 1: Token Linting Infrastructure** - Add scripts and dependencies for agent/skill token validation
+- [x] **Phase 2: PR Checks Workflow** - Automated quality gates on pull requests
+- [x] **Phase 3: Extension Release Workflow** - Tag-triggered VSIX build, GitHub Release, and Marketplace publishing
+- [x] **Phase 4: CLI Publish Workflow** - Tag-triggered npm publish with OIDC
+- [x] **Phase 5: Documentation** - Technical reference and README updates
 
 ## Phase Candidates
 
