@@ -5,7 +5,7 @@ suite('Platform Detection Test Suite', () => {
   suite('getPlatformInfo', () => {
     test('should return a valid platform', () => {
       const platform = getPlatformInfo();
-      assert.ok(['darwin', 'win32', 'linux'].includes(platform));
+      assert.ok(['darwin', 'win32', 'linux', 'wsl'].includes(platform));
     });
   });
 
