@@ -6,16 +6,19 @@
 # and are published to npm with the 'beta' tag instead of 'latest'.
 #
 # AUTHENTICATION:
-# Uses npm OIDC (OpenID Connect) for secure publishing without storing tokens.
-# This requires the package to be configured for provenance on npmjs.com.
+# This workflow uses NPM_TOKEN secret for npm authentication.
+# To set up:
+# 1. Generate an npm access token at https://www.npmjs.com/settings/tokens
+# 2. Add as repository secret: Settings → Secrets → Actions → NPM_TOKEN
 #
-# PREREQUISITES (one-time setup):
-# 1. Package must be published manually first time with: npm publish --access public
+# For enhanced security with provenance, you can also configure npm OIDC:
+# 1. In cli/package.json, add: "publishConfig": { "provenance": true }
 # 2. On npmjs.com, link the package to the GitHub repository
-# 3. Enable "Require two-factor authentication or an automation token or granular access token"
-# 4. In cli/package.json, add: "publishConfig": { "provenance": true }
+# 3. The id-token permission below enables OIDC attestation
 #
-# No NPM_TOKEN secret is needed - OIDC handles authentication via id-token permission.
+# PREREQUISITES (first-time setup):
+# 1. Create NPM_TOKEN secret in repository settings
+# 2. First publish may need to be manual: cd cli && npm publish --access public
 name: Publish CLI
 
 on:

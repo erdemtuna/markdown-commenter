@@ -136,6 +136,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Publish to VS Code Marketplace
+        id: marketplace
         # continue-on-error ensures GitHub Release is created even if Marketplace fails
         # This provides resilience: users can always download VSIX from GitHub
         continue-on-error: true
