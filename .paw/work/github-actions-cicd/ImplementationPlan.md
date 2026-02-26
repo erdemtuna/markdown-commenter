@@ -108,7 +108,7 @@ Implementing automated CI/CD infrastructure for markdown-commenter, consisting o
     4. `npm run lint` (TypeScript linting)
     5. `npm run compile` (build extension)
     6. xvfb setup + `npm test` (VS Code extension tests)
-    7. `cd cli && npm ci && npm test` (CLI tests)
+    7. `cd cli && npm ci && npm test` (CLI tests — currently no test files exist, step passes vacuously)
     8. `npm run lint:agent:all` (agent/skill token linting)
     9. Summary message on success
 
@@ -198,6 +198,11 @@ Implementing automated CI/CD infrastructure for markdown-commenter, consisting o
     9. `npm publish --access public --tag <latest|beta>` (OIDC auth)
     10. Check if GitHub Release exists (working-directory override to repo root)
     11. Create GitHub Release
+
+**Prerequisites for npm OIDC**:
+- cli/package.json must have `"publishConfig": { "provenance": true }` for OIDC to work
+- Package must be linked to GitHub repository in npm settings
+- First publish may require manual setup on npmjs.com
 
 **Inline documentation comments** to add:
 - npm OIDC setup requirements (package must be configured for provenance)
