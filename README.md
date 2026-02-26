@@ -158,28 +158,7 @@ Releases are automated via GitHub Actions:
 - **Extension**: Push a `v*` tag (e.g., `git tag v1.0.0 && git push origin v1.0.0`)
 - **CLI**: Push a `cli-v*` tag (e.g., `git tag cli-v1.0.0 && git push origin cli-v1.0.0`)
 
-### Repository setup (Maintainers)
-
-The following GitHub Actions secrets must be configured for CI/CD to work:
-
-| Secret | Required For | How to Get |
-|--------|--------------|------------|
-| `VSCE_PAT` | Extension releases | [Azure DevOps](https://dev.azure.com) → User Settings → Personal Access Tokens → New Token with **Marketplace (Publish)** scope |
-| `NPM_TOKEN` | CLI publishing | [npmjs.com](https://www.npmjs.com/settings/~/tokens) → Access Tokens → Generate New Token (Automation) |
-
-Set secrets at: **Settings → Secrets and variables → Actions → New repository secret**
-
-#### First-time CLI publish
-
-The first npm publish must be done manually to establish the package:
-
-```bash
-cd cli
-npm login
-npm publish --access public
-```
-
-After this, subsequent publishes use the `NPM_TOKEN` secret automatically.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for maintainer setup (secrets, first-time publish, etc.).
 
 ## Contributing
 
