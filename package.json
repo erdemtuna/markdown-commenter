@@ -3,7 +3,7 @@
   "displayName": "Markdown Commenter",
   "description": "AI-assisted markdown annotation with Copilot CLI skill and VS Code Chat agent",
   "version": "0.0.1-dev",
-  "publisher": "erdem-tuna",
+  "publisher": "ErdemTuna",
   "license": "MIT",
   "icon": "images/icon.png",
   "repository": {
