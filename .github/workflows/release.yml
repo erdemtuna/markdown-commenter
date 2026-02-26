@@ -1,0 +1,155 @@
+# Automatically builds and releases the VS Code extension when version tags are pushed.
+# Triggers on tags matching v* pattern (e.g., v0.2.0, v1.0.0).
+# Builds extension, packages VSIX, creates GitHub Release, and publishes to VS Code Marketplace.
+#
+# Pre-release convention: odd minor versions (0.1.x, 0.3.x) are pre-releases,
+# even minor versions (0.2.x, 0.4.x) are stable releases.
+#
+# SECRETS REQUIRED:
+# - VSCE_PAT: Personal Access Token for VS Code Marketplace publishing
+#   To create: https://code.visualstudio.com/api/working-with-extensions/publishing-extension#get-a-personal-access-token
+#   Required scopes: Marketplace (Manage)
+#   Add to repository: Settings → Secrets and variables → Actions → New repository secret
+#
+# The workflow will create a GitHub Release even if Marketplace upload fails,
+# ensuring users can always download the VSIX manually.
+name: Release VSIX
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write  # Required to create releases and upload assets
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Compile extension
+        run: npm run compile
+      
+      - name: Extract version from tag
+        id: version
+        run: |
+          # Extract semantic version from tag (e.g., v0.2.0 -> 0.2.0)
+          # This version becomes the source of truth for the release
+          TAG_NAME="${{ github.ref_name }}"
+          VERSION="${TAG_NAME#v}"  # Remove 'v' prefix using bash parameter expansion
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Extracted version: ${VERSION}"
+      
+      - name: Update package.json version to match tag
+        run: |
+          # Set package.json version to match the git tag
+          # This eliminates the need for manual version updates before tagging
+          # Local development stays on "0.0.1-dev" so every activation reinstalls agents
+          # The release workflow overwrites that dev suffix with the semver tag
+          TAG_VERSION="${{ steps.version.outputs.version }}"
+          npm version ${TAG_VERSION} --no-git-tag-version --allow-same-version
+          echo "Updated package.json to version: ${TAG_VERSION}"
+      
+      - name: Determine pre-release status
+        id: prerelease
+        run: |
+          # VS Code extension convention: odd minor versions (0.1.x, 0.3.x) are pre-releases,
+          # even minor versions (0.2.x, 0.4.x) are stable releases
+          # This follows the VS Code pre-release extension best practices
+          VERSION="${{ steps.version.outputs.version }}"
+          # Extract minor version (second number in semver, e.g., 0.2.0 -> 2)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          # Check if minor version is odd (pre-release) or even (stable)
+          if [ $((MINOR % 2)) -eq 1 ]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "This is a pre-release version (minor=$MINOR is odd)"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "This is a stable release version (minor=$MINOR is even)"
+          fi
+      
+      - name: Package VSIX
+        run: npm run package
+      
+      - name: Verify VSIX created
+        id: vsix
+        run: |
+          # Verify the VSIX file was created with the expected filename format
+          # The package name comes from package.json: markdown-commenter-<version>.vsix
+          VSIX_FILE="markdown-commenter-${{ steps.version.outputs.version }}.vsix"
+          if [ ! -f "$VSIX_FILE" ]; then
+            echo "Error: Expected VSIX file not found: $VSIX_FILE"
+            exit 1
+          fi
+          # Export both the full path (for release upload) and filename (for display)
+          echo "vsix_path=${VSIX_FILE}" >> $GITHUB_OUTPUT
+          echo "vsix_name=${VSIX_FILE}" >> $GITHUB_OUTPUT
+          echo "VSIX created successfully: $VSIX_FILE"
+      
+      - name: Check if release exists
+        id: check_release
+        run: |
+          RELEASE_EXISTS=$(gh release view "${{ github.ref_name }}" --json id 2>/dev/null || echo "")
+          if [ -n "$RELEASE_EXISTS" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          body: |
+            Release notes will be added by the release preparation process.
+            
+            ## Installation
+            
+            Download the `.vsix` file and install via:
+            ```bash
+            code --install-extension ${{ steps.vsix.outputs.vsix_name }}
+            ```
+            
+            Or install from VS Code Marketplace (if published successfully).
+          files: ${{ steps.vsix.outputs.vsix_path }}
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Publish to VS Code Marketplace
+        # continue-on-error ensures GitHub Release is created even if Marketplace fails
+        # This provides resilience: users can always download VSIX from GitHub
+        continue-on-error: true
+        run: |
+          echo "Publishing to VS Code Marketplace..."
+          npx vsce publish --pat ${{ secrets.VSCE_PAT }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      
+      - name: Marketplace publish status
+        if: always()
+        run: |
+          if [ "${{ steps.marketplace.outcome }}" == "failure" ]; then
+            echo "⚠️ VS Code Marketplace publish failed"
+            echo "GitHub Release was still created with VSIX attached"
+            echo "You can manually publish later with: npx vsce publish"
+          fi
